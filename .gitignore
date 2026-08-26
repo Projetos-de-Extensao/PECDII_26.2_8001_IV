@@ -1,0 +1,71 @@
+# MkDocs
+site/
+.mkdocs.yml.bak
+.cache/
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Dependencies
+node_modules/
+.npm
+
+# Environment variables
+.env
+.env.local
+.cache/mkdocs-jupyter/1a048d484167348e67d854864b3320a082abbbc00190f0d082c32238825d9cd2.json
+.cache/mkdocs-jupyter/1d447f3a211c6ea8dd4256e3d2ba3bac2cf0c5e88e9eaf271581ba6ad583cfc1.json
+.cache/mkdocs-jupyter/1f6916d8840b6ee3d7dd1de11470cd833cf323478349cfb4bb97d89942b187e1.json
+.cache/mkdocs-jupyter/2b190bb46b83de3c9d0c878802f2fdf90cc7e61d69a134c7cd7b192d29d9be44.json
+.cache/mkdocs-jupyter/02fb2c8c4ccd1397beb46b04f84e31f897aefc590cfde564f1ccfba4447d908f.json
+.cache/mkdocs-jupyter/3eab64fc2723bc13b712677ac0cfc8124cea3d085818b90fea08ddc0b4d9838f.json
+.cache/mkdocs-jupyter/7e4933ccabc1b30fd33f741084d601e64ee38dfcf26480e7fe1fb861811b31ab.json
+.cache/mkdocs-jupyter/9a9c0c158bcc5771d50b41cb1ad89b336be15109ebbc679da1cab2045a97e267.json
+.cache/mkdocs-jupyter/9a289833cc202f947d9a5428dfc9a958cc78892487b2a755e8f6a91c47c49fcb.json
+.cache/mkdocs-jupyter/25aa48a0d379f1a5b132c62edb9840e655f29e98596c7c8c775c0f466e9c87b5.json
+.cache/mkdocs-jupyter/39cd9c8a95c3de674b7ad3f56e53500d244fad93dcff9d832a805077e04858cd.json
+.cache/mkdocs-jupyter/654bf400f39adcbaf2415e29d7efdbd0fe13586321aadae1f8db978ce7ec7b65.json
+.cache/mkdocs-jupyter/1681b9f272a8fe113bfecb11a9578447dfdd0b3cc8efaf8b24c521fdda377efc.json
+.cache/mkdocs-jupyter/275038a38c405ce0f8efc49da4a2e96c2e496daee21f9d368ab2427ca67c1311.json
+.cache/mkdocs-jupyter/aa8c0507c88a965f28281dce78c210a2f90c61fa3a48ee737403a20f127b648c.json
+.cache/mkdocs-jupyter/ad4ecbff15191ef9a38b13a52cc60dd4b1b4c3872e7eea95236b7c84b34ef2a4.json
+.cache/mkdocs-jupyter/b91ab253a204bb7ab2cc61fedc9efe7a9b8604064c883506da89b46338861568.json
+.cache/mkdocs-jupyter/bf6ff2c073f15ddc99f7fbe9dcbde9a5f0f2f8e308d61c262569a62da5abb4f7.json
+.cache/mkdocs-jupyter/c8e4016dd82d4b9b64d4e60f42a0f955e67540134420b0bbd38aaa9fd8f95ff3.json
+.cache/mkdocs-jupyter/da4d031b42964c1c7978079da277dfa2ec016d4b34d8d21b314b1d94ff10415e.json
+.cache/mkdocs-jupyter/e449f72e5bf51cf9f474f06edc4c451d63eece12c5e92371d4f7fd68096acde6.json
+.cache/mkdocs-jupyter/f0d2c0b449afcf7aa6ec475a800d1deb21b1d76419439d7fb0e60e9b2794d158.json
+.cache/mkdocs-jupyter/f03484b3235254cd644b48f11e8d6e67c0370610b5cbbd2714a8896b00f2d344.json
+.cache/mkdocs-jupyter/c4dd72c10d4fc791ce4c7340891edbb5b95cac7b271cc08a9467bf48a29e7e31.json

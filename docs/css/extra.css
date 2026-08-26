@@ -1,0 +1,112 @@
+:root>* {
+  --md-primary-fg-color: #193257;
+  --md-primary-fg-color--light: #4c92fa;
+  font-weight: 500;
+  --md-primary-fg-color--dark: #4c92fa;
+  --md-primary-bg-color: #FAB90A;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--md-primary-fg-color);
+
+}
+
+.table td {
+  font-size: 1.7em;
+}
+
+.grid.four-cols {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1.5rem;
+}
+
+.grid.four-cols ul {
+  display: contents;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grid.four-cols li {
+  min-width: 0;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  padding: 1rem;
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.grid.four-cols li:hover {
+  border-color: #e7ebf2;
+  box-shadow: 0 4px 12px rgba(25, 50, 87, 0.08);
+  transform: translateY(-1px);
+}
+
+.grid.four-cols a,
+.grid.four-cols a:visited,
+.grid.four-cols a:hover,
+.grid.four-cols a:active {
+  color: #FAB90A;
+}
+
+@media (max-width: 1024px) {
+  .grid.four-cols {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .grid.four-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
+.module-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    padding: 25px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.module-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Specific adjustments for header vs content */
+.card-header {
+    margin-bottom: 15px;
+    font-size: 1.4em; /* Or use an H3 tag instead of raw markdown rendering */
+}
+
+.contributors {
+    color: #666;
+    padding: 10px 0;
+    border-bottom: 1px dashed #eee;
+    margin-bottom: 20px;
+}
+
+.button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    background-color: #193257; /* Primary color */
+    color: white;
+    transition: background-color 0.2s;
+}
+
+.button:hover {
+    background-color: #0b469f; /* Lighter shade on hover */
+    
+}
