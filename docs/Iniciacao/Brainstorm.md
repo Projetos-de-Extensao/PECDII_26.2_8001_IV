@@ -17,7 +17,7 @@ O brainstorm é uma técnica de elicitação de requisitos que consiste em reuni
 ## Metodologia
 
 <p align="justify">
-A equipe se reuniu por meio de [local ou plataforma], em [data], com início às [horário inicial] e término às [horário final]. A moderação foi realizada por [nome do moderador], que conduziu a discussão com perguntas previamente elaboradas. As contribuições foram consolidadas neste documento, com foco na gestão de alunos, profissionais, agendamentos e acompanhamento da evolução dos alunos de um centro de treinamento.
+A equipe se reuniu por meio de reunião, em 08/09/2026, com início às 12:30 e término às 13:30. A moderação foi realizada por Daniel Gusmão, que conduziu a discussão com perguntas previamente elaboradas. As contribuições foram consolidadas neste documento, com foco na gestão de alunos, profissionais, agendamentos e acompanhamento da evolução dos alunos de um centro de treinamento.
 </p>
 
 ## Brainstorm
