@@ -3,127 +3,135 @@ id: brainstorm
 title: Brainstorm
 ---
  
+---
+id: brainstorm
+title: Brainstorm
+---
+
 ## Introdução
-<p align = "justify">
-O brainstorm é uma técnica de elicitação de requisitos que consiste em reunir a equipe e discutir sobre diversos tópicos gerais do projeto apresentados no documento problema de negócio. No brainstorm o diálogo é incentivado e críticas são evitadas para permitir que todos colaborem com suas próprias ideias.
+
+<p align="justify">
+O brainstorm é uma técnica de elicitação de requisitos que consiste em reunir a equipe para discutir tópicos gerais do projeto apresentados no documento de problema de negócio. Durante a atividade, o diálogo é incentivado e as críticas são evitadas, permitindo que todos contribuam com suas ideias.
 </p>
- 
+
 ## Metodologia
-<p align = "justify">
-A equipe se reuniu para debater ideias gerais sobre o projeto via..., começou .... e terminou..., onde o XXXX XXXX foi o moderador, direcionando a equipe com questões pré-elaboradas, e transcrevendo as respostas para o documento.
+
+<p align="justify">
+A equipe se reuniu por meio de [local ou plataforma], em [data], com início às [horário inicial] e término às [horário final]. A moderação foi realizada por [nome do moderador], que conduziu a discussão com perguntas previamente elaboradas. As contribuições foram consolidadas neste documento, com foco na gestão de alunos, profissionais, agendamentos e acompanhamento da evolução dos alunos de um centro de treinamento.
 </p>
- 
+
 ## Brainstorm
- 
+
 ## Versão 1.0
- 
+
 ## Perguntas
- 
+
 ### 1. Qual o objetivo principal da aplicação?
- 
-<p align = "justify">
-<b>XXXX</b> - Deve ser uma plataforma onde qualquer pessoa possa...
-</p>
- 
-<b>ZZZ</b> - A plataforma deve fornece...
- 
-<b>YYYY</b> - O objetivo da aplicação é....
- 
-<b>WWWW</b> - O principal objetivo da aplicação é a...
- 
-<b>KKKK</b> - A plataforma deve gerenciar...
-</p>
- 
----
- 
-### 2. Como será o processo para cadastrar um novo cliente?
- 
-<p align = "justify">
-<b>XXXX</b> - O moderador deverá fazer login e...
- 
-<b>YYYY</b> - O cliente...
- 
-<b>WWWW</b> - Com o usuário logado, ele deverá...
 
-<b>ZZZZ</b> - O cliente...
- 
-<b>KKK</b> - O cliente...
- 
----
- 
-### 3. Como será a forma de adicionar produtos?
- 
-<p align = "justify">
-<b>XXXX</b> - O cliente ao cadastrar...
+<p align="justify">
+<b>Síntese das ideias:</b> A aplicação deve centralizar a gestão dos horários de alunos e profissionais do centro de treinamento, além de permitir o registro e a consulta de informações sobre a evolução dos alunos. O objetivo principal é apoiar os profissionais no acompanhamento do desenvolvimento de cada aluno, por meio do histórico de atendimentos, avaliações e relatórios.
 </p>
- 
-<p align = "justify">
-<b>YYYYY</b> - O produto tem...
-</p>
- 
-<b>ZZZZ</b> - O produto....
- 
-<b>XXXX</b> - O produto....
 
- 
 ---
- 
-### 4. Outras perguntas pertinentes ao contexto
 
-<p align = "justify">
-<b>XXXX</b> - Com a localização...
- 
-<b>YYYY</b> - O cliente...
- 
-<b>ZZZ</b> - O cliente...
- 
+### 2. Como será o processo para agendamento de horário?
+
+<p align="justify">
+<b>Síntese das ideias:</b> O usuário deverá realizar login, consultar os profissionais disponíveis, selecionar o profissional desejado e verificar os horários livres em sua agenda. Após escolher o horário e confirmar a solicitação, o sistema deverá registrar o agendamento, enviar uma confirmação e emitir lembretes antes do atendimento.
+</p>
+
+**Fluxo proposto:**
+
+Login → Consulta de profissionais → Seleção do profissional → Consulta de horários disponíveis → Escolha do horário → Confirmação do agendamento → Envio de confirmação e lembretes.
+
 ---
- 
-### 5. "Outras perguntas pertinentes ao contexto", Como seria a forma de adicionar do cliente adicionar os produtos ?
-<p align = "justify">
-<b>XXX</b> - O cliente....
-</p>
- 
-### 6. Quais informações seriam interessante para o cliente?
-<p align = "justify">
-   <b>XXX</b> - Informações...
-   
-   <b>ZZZZ</b> - O cliente usuário poderá acessar informações...
 
-   <b>WWWWs</b> - O usuário poderá ver scouts de partidas do torneio, ver as regras dos torneios, locais e data das partidas.
-   
+### 3. Como será o processo para cadastrar um novo aluno?
+
+<p align="justify">
+<b>Síntese das ideias:</b> O cadastro deverá incluir a coleta e a verificação dos documentos necessários, a autorização dos responsáveis quando aplicável e a apresentação dos exames médicos exigidos pelo centro. Após a conferência das informações e a resolução das pendências, o cadastro poderá ser concluído.
 </p>
- 
+
+**Fluxo proposto:**
+
+Coleta e verificação de documentos → Coleta de autorização do responsável, quando aplicável → Solicitação e apresentação dos exames médicos exigidos → Conferência das informações → Conclusão do cadastro.
+
+---
+
+### 4. Como será realizado o acompanhamento da evolução do aluno?
+
+<p align="justify">
+<b>Síntese proposta para validação:</b> Os profissionais poderão registrar avaliações, observações e resultados relacionados aos objetivos de cada aluno. Essas informações deverão compor um histórico que permita acompanhar mudanças ao longo do tempo e apoiar o planejamento dos próximos atendimentos.
+</p>
+
+<p align="justify">
+Os critérios utilizados para avaliar a evolução deverão ser definidos pela equipe conforme as modalidades oferecidas e os objetivos dos alunos.
+</p>
+
+---
+
+### 5. Como será a geração de relatórios?
+
+<p align="justify">
+<b>Síntese das ideias:</b> O sistema deverá permitir que os profissionais gerem relatórios para acompanhar a evolução dos alunos, conforme suas necessidades.
+</p>
+
+<p align="justify">
+<b>Detalhamento proposto para validação:</b> Os relatórios poderão ser filtrados por aluno e período, apresentando avaliações, observações e resultados registrados. O conteúdo e o formato dos relatórios deverão ser definidos com os profissionais do centro.
+</p>
+
+---
+
+### 6. Quais informações seriam interessantes para o aluno ou responsável?
+
+<p align="justify">
+<b>Síntese das ideias:</b> O aluno ou responsável deverá ter acesso a lembretes de agendamento, notificações essenciais e informações financeiras relacionadas aos serviços contratados.
+</p>
+
+**Informações sugeridas:**
+
+- **Agendamentos:** datas, horários e profissionais responsáveis pelos próximos atendimentos.
+- **Lembretes:** avisos prévios sobre os atendimentos agendados.
+- **Notificações essenciais:** confirmações, alterações ou cancelamentos de atendimentos e pendências cadastrais.
+- **Comunicados gerais:** informações sobre o funcionamento e as atividades do centro.
+- **Financeiro:** valores, vencimentos e situação dos pagamentos.
+
+---
+
 ### Requisitos elicitados
- 
-|ID|Descrição|
-|----|-------------|
-|BS01| O cliente...|
-|BS02| O cliente...|
-|BS03| O cliente...|
-|BS04| O cliente...|
-|BS05| O cliente...|
-|BS06| O cliente...|
-|BS07| O cliente...|
-|BS08| O cliente...|
-|BS09| O cliente...|
-|BS10| O produto...|
-|BS11| O produto...|
-|BS12| O produto...|
-|BS13| O produto...|
-|BS14| O produto...|
-|BS15| O produto...|
- 
+
+Os requisitos abaixo consolidam as ideias apresentadas. Os itens identificados como propostas deverão ser validados pela equipe antes de integrarem o escopo.
+
+| ID | Descrição |
+|----|-----------|
+| BS01 | O sistema deve permitir a autenticação dos usuários. |
+| BS02 | O sistema deve permitir o cadastro de alunos. |
+| BS03 | O sistema deve permitir o registro e a verificação dos documentos necessários ao cadastro. |
+| BS04 | O sistema deve permitir o registro da autorização dos responsáveis, quando aplicável. |
+| BS05 | O sistema deve permitir o controle da entrega dos exames médicos exigidos pelo centro. |
+| BS06 | O sistema deve permitir a consulta dos profissionais disponíveis para atendimento. |
+| BS07 | O sistema deve permitir a consulta dos horários disponíveis de cada profissional. |
+| BS08 | O sistema deve permitir o agendamento de um atendimento com o profissional e o horário selecionados. |
+| BS09 | O sistema deve enviar confirmações de agendamento. |
+| BS10 | O sistema deve enviar lembretes dos atendimentos agendados. |
+| BS11 | O sistema deve disponibilizar notificações essenciais e comunicados aos alunos ou responsáveis. |
+| BS12 | O sistema deve permitir que os profissionais gerem relatórios para acompanhar a evolução dos alunos. |
+| BS13 | O sistema deve disponibilizar informações financeiras ao aluno ou responsável. |
+| BS14 | **Proposta:** o sistema deve permitir que os profissionais registrem avaliações, observações e resultados dos alunos. |
+| BS15 | **Proposta:** o sistema deve permitir a consulta do histórico de evolução do aluno e a geração de relatórios com filtros por aluno e período. |
+
 ## Conclusão
-<p align = "justify">
-Através da aplicação da técnica, foi possível elicitar alguns dos primeiros requisitos do projeto.
+
+<p align="justify">
+A aplicação da técnica de brainstorm permitiu identificar os primeiros requisitos relacionados ao cadastro de alunos, ao agendamento de atendimentos, à comunicação com alunos e responsáveis e ao acompanhamento da evolução dos alunos. As propostas de detalhamento deverão ser validadas com os envolvidos, especialmente quanto aos critérios de evolução, ao conteúdo dos relatórios e às funcionalidades financeiras.
 </p>
+
 ## Referências Bibliográficas
- 
-> BARBOSA, S. D. J; DA SILVA, B. S. Interação humano-computador. Elsevier, 2010.
- 
- 
+
+> BARBOSA, S. D. J.; DA SILVA, B. S. Interação humano-computador. Elsevier, 2010.
+
 ## Autor(es)
+
 | Data | Versão | Descrição | Autor(es) |
-| -- | -- | -- | -- |
-| DD/MM/YYYY | 1.0 | Criação do documento | XXX XXXX, XXXX XXXX, YYY YYYY e ZZZ XXXX |
+|------|--------|-----------|-----------|
+| [08/09/2026] | 1.0 | Criação do documento | Daniel Gusmão |
