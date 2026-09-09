@@ -1,13 +1,21 @@
 # Construção
 
-> Objetivo: Construir o sistema com base na arquitetura definida.
+> Objetivo: Desenvolver o sistema de gestão da Playmakerz com base nos requisitos e na arquitetura definidos pela equipe.
 
 ## Principais atividades
 
-* Desenvolver os componentes e funcionalidades do sistema.
+* Desenvolver o cadastro de usuários, profissionais e alunos;
 
-* Realizar testes de integração e sistema.
+* Implementar o controle de espaços e equipamentos;
 
-* Iterações para entregar versões parciais e funcionais do software.
+* Criar o sistema de agendamentos e horários recorrentes;
 
-* Produto principal: Software em funcionamento, pronto para ser entregue.
+* Aplicar diferentes níveis de acesso;
+
+* Priorizar a segurança dos dados de crianças e adolescentes;
+
+* Realizar testes e corrigir os problemas encontrados;
+
+* Entregar versões parciais durante o desenvolvimento.
+
+* Produto principal: Sistema funcional para auxiliar na organização e no atendimento da Playmakerz.

@@ -1,15 +1,23 @@
 # Iniciação
 
-> Objetivo: Definir o escopo inicial do projeto e alinhar os objetivos principais.
+> Objetivo: Entender as necessidades da Playmakerz e definir o escopo inicial do sistema.
 
 ## Principais atividades
 
-* Identificar os principais requisitos (funcionais e não funcionais).
+* Conhecer a rotina e os principais problemas da academia;
 
-* Estimar custos e prazos iniciais.
+* Identificar o público-alvo e os usuários do sistema;
 
-* Avaliar riscos de alto nível.
+* Pesquisar aplicativos e soluções semelhantes;
 
-* Criar um caso de negócio (business case).
+* Levantar os requisitos iniciais;
 
-* Produto principal: Visão do projeto e caso de negócio aprovado.
+* Definir os objetivos e os limites do projeto;
+
+* Avaliar riscos, custos e prazos iniciais;
+
+* Considerar a proteção dos dados de crianças e adolescentes;
+
+* Organizar as ideias por meio de pesquisa, brainstorming e mapa mental.
+
+* Produto principal: Visão inicial do sistema e escopo alinhado às necessidades da Playmakerz.

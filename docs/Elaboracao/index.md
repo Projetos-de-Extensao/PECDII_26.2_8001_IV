@@ -1,15 +1,21 @@
 # Elaboração
 
-Objetivo: Refinar os requisitos, resolver os riscos críticos e definir a arquitetura base.
+Objetivo: Detalhar os requisitos do sistema da Playmakerz e definir a arquitetura que será utilizada no desenvolvimento.
 
 ## Principais atividades:
 
-Detalhar os requisitos mais importantes.
+* Detalhar os requisitos funcionais e não funcionais;
 
-Desenvolver uma arquitetura de software robusta.
+* Definir as regras de agendamento e recorrência;
 
-Criar protótipos ou provas de conceito.
+* Planejar o controle de espaços e equipamentos;
 
-Planejar as próximas fases com mais precisão.
+* Definir os tipos de usuário e suas permissões;
 
-Produto principal: Arquitetura validada e plano de desenvolvimento para a fase de construção.
+* Considerar a segurança dos dados de crianças e adolescentes;
+
+* Criar diagramas e protótipos do sistema;
+
+* Organizar as próximas etapas do desenvolvimento.
+
+* Produto principal: Requisitos detalhados, arquitetura definida e planejamento preparado para a fase de construção.
