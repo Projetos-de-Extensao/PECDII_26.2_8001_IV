@@ -1,15 +1,21 @@
 # Transição
 
-> Objetivo: Entregar o sistema ao ambiente de produção e aos usuários finais.
+> Objetivo: Preparar e entregar o sistema de gestão da Playmakerz, garantindo seu funcionamento e a segurança dos dados de crianças e adolescentes.
 
 ## Principais atividades
 
-* Realizar testes finais de aceitação.
+* Realizar os testes finais de aceitação;
 
-* Treinar os usuários.
+* Validar os agendamentos e o controle de conflitos;
 
-* Corrigir defeitos encontrados após a entrega.
+* Verificar as permissões de cada tipo de usuário;
 
-* Preparar o ambiente de produção.
+* Corrigir os problemas encontrados;
 
-* Produto principal: Sistema funcionando no ambiente do cliente com usuários treinados.
+* Preparar o ambiente de produção;
+
+* Orientar os usuários sobre o uso do sistema;
+
+* Acompanhar o período inicial após a entrega.
+
+* Produto principal: Sistema funcionando no ambiente da Playmakerz, com usuários orientados e dados protegidos.
