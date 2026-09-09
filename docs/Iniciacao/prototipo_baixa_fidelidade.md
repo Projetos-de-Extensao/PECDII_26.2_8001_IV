@@ -1,142 +1,67 @@
+# Protótipo de Baixa Fidelidade — Playmakerz
+
+## Tela 1 — Login e Cadastro
+
+### Login
+
+Campo: E-mail  
+Campo: Senha  
+Botão: Entrar  
+Botão: Criar conta  
+Link: Esqueci minha senha  
+
+Observação: cada usuário deverá ter acesso somente às informações necessárias para sua função, visando proteger dados pessoais e sensíveis.
+
+### Cadastro
+
+Campo: Nome  
+Campo: E-mail  
+Campo: Telefone  
+Campo: Senha  
+Campo: Confirmar senha  
+Seleção: Tipo de usuário  
+Botão: Cadastrar  
+
+Observação: para atletas menores de idade, deverá ser considerada a associação da conta a um pai ou responsável.
+
+Observação: o cadastro e as permissões de determinados perfis, principalmente funcionários e profissionais, poderão depender de autorização da administração.
+
 ---
-id: prototipobaixa
-title: Protótipo Baixa Fidelidade
----
-## Introdução
 
-<p align = "justify">
-A construção do protótipo de alta fidelidade auxilia a equipe de desenvolvimento a encontrar um nível de detalhes abrangentes, extrair funcionalidades, testar usabilidade, e também fornece uma base para o gerenciamento do projeto pois com o protótipo é possível realizar estimativas de quanto tempo será necessário desempenhar em cada funcionalidade.
-</p>
+## Tela 2 — Informações de Agendamento
 
-## Metodologia
+Cabeçalho: identificação do usuário e acesso aos seus agendamentos  
+Seleção: tipo de agendamento — individual ou em grupo  
+Seleção: atleta ou atletas participantes  
+Seleção: profissional responsável  
+Campo: data do atendimento  
+Campo: horário de início e término  
+Seleção: espaço onde será realizado o atendimento  
+Seleção: equipamentos necessários  
+Seleção: repetição do agendamento — único ou recorrente  
+Botão: Verificar disponibilidade  
 
-<p align = "justify">
-Iniciamos o projeto através dos levantamentos iniciais da equipe, após discussões a ferramenta Figma foi selecionada para produzir o protótipo de alta fidelidade com auxílio do Material Design Color Tool.
-</p>
+### Verificação do Agendamento
 
-## Protótipo de alta fidelidade
+Antes da confirmação, o sistema deverá verificar se os elementos envolvidos no atendimento estão disponíveis durante o período selecionado.
 
-### Versão 1.0
+Verificação: disponibilidade do atleta  
+Verificação: disponibilidade do profissional  
+Verificação: disponibilidade do espaço  
+Verificação: disponibilidade dos equipamentos selecionados  
+Verificação: existência de bloqueios por manutenção  
+Mensagem: informar quando o agendamento estiver disponível  
+Mensagem de conflito: informar quando algum atleta, profissional, espaço ou equipamento já estiver associado a outro agendamento no mesmo período ou estiver indisponível  
 
-### Tela Login
+Botão: Confirmar agendamento
 
-[![Prototipo 1](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
+Observação: o sistema deverá impedir reservas duplicadas ou com conflito de horário.
 
-### Tela Cadastro 1
+Observação: após a confirmação, o agendamento deverá ficar disponível para consulta pelos usuários autorizados de acordo com seus respectivos perfis.
 
-[![Prototipo 2](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
+Observação: atletas e responsáveis deverão visualizar apenas os agendamentos relacionados a eles, enquanto profissionais deverão consultar sua própria agenda. Perfis administrativos poderão possuir acesso mais amplo conforme suas permissões.
 
-### Tela Cadastro 2
-
-[![Prototipo 3](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela Esqueceu Senha
-
-[![Prototipo 4](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela do Feed
-
-[![Prototipo 5](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela Feed com configurações
-
-[![Prototipo 6](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela Perfil
-
-[![Prototipo 7](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela Cadastrar torneio 1
-
-[![Prototipo 8](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela Cadastrar torneio 2
-
-[![Prototipo 9](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela Cadastrar torneio 3
-
-[![Prototipo 10](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela Cadastrar torneio 4
-
-[![Prototipo 11](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela com meus torneios
-
-[![Prototipo 12](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela de inscrição em torneio
-
-[![Prototipo 13](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-<p align = "justify">
-Na primeira versão do protótipo utilizamos a ferramenta <a href="https://material.io/resources/color/#!/?view.left=0&view.right=0">Material Design Color Tool</a>  para auxiliar na criação da paleta de cores do aplicativo, definimos as cores base do aplicativo mas as cores definidas para as telas 12 e 13 ainda não foram decididas.
-</p>
-
-### Versão 2.0
-
-### Versão 1.0
-
-### Tela Login
-
-[![Prototipo 1](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela Cadastro 1
-
-[![Prototipo 2](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela Cadastro 2
-
-[![Prototipo 3](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela Esqueceu Senha
-
-[![Prototipo 4](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela do Feed
-
-[![Prototipo 5](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela Feed com configurações
-
-[![Prototipo 6](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela Perfil
-
-[![Prototipo 7](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela Cadastrar torneio 1
-
-[![Prototipo 8](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela Cadastrar torneio 2
-
-[![Prototipo 9](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela Cadastrar torneio 3
-
-[![Prototipo 10](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela Cadastrar torneio 4
-
-[![Prototipo 11](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela com meus torneios
-
-[![Prototipo 12](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-### Tela de inscrição em torneio
-
-[![Prototipo 13](../assets/Prototipo/image.png)](../assets/Prototipo/image.png)
-
-link para o `<a href="https://www.figma.com/">`Protótipo`</a>`
-
-## Conclusão
-
-<p align = "justify">
-A partir da elaboração do protótipo foi possível ter uma noção inicial da interface do usuário, definindo fluxo, paleta de cores, botões, app bars e diversas outras funcionalidades
-</p>
+Observação: o sistema deverá permitir posteriormente o acompanhamento do status do atendimento, incluindo presença, falta ou cancelamento, conforme previsto no escopo do projeto.
 
 ## Referências
 
@@ -150,7 +75,5 @@ A partir da elaboração do protótipo foi possível ter uma noção inicial da 
 
 | Data     | Versão | Descrição                            | Autor(es)                                                                            |
 | -------- | ------- | -------------------------------------- | ------------------------------------------------------------------------------------ |
-| 07/09/20 | 1.0     | Criação do documento                 | Lucas Alexandre e Matheus Estanislau                                                 |
-| 07/09/20 | 1.1     | Adicionado as imagens do protótipo    | Lucas Alexandre e Matheus Estanislau                                                 |
-| 07/09/20 | 1.2     | Adicionado conclusão e referências   | Lucas Alexandre e Matheus Estanislau                                                 |
-| 26/10/20 | 2.0     | Adicionada a versão 2.0 do protótipo | João Pedro, Lucas Alexandre, Matheus Estanislau, Moacir Mascarenha e Renan Cristyan |
+|01/09/26|1.0| Criação do documento|Marcos Martins|
+
