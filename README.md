@@ -3,6 +3,7 @@ Sistema de Gestão da Playmakerz
 
 **Código da Disciplina**: IBM8936<br>
 **Turma: PECDII_26.2_8001**: Grupo IV<br>
+**Alunos: Daniel Gusmão, Marcos Vinicius, Maria Eduarda, Pedro Henrique
 
 
 ## Sobre 

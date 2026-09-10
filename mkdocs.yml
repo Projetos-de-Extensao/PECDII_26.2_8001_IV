@@ -10,10 +10,10 @@ nav:
       - Index: Iniciacao/index.md
       - Pesquisa: Iniciacao/pesquisa.md
       - 5w2h: Iniciacao/5w2h.md
-      - Design Thinking: Iniciacao/design_thinking.md
       - Brainstorming: Iniciacao/Brainstorm.md
       - Mapa Mental: Iniciacao/mapa_mental.md
       - Prototipagem Baixa Fidelidade: Iniciacao/prototipo_baixa_fidelidade.md
+      - Design Thinking: Iniciacao/design_thinking.md
   - Elaboração:
       - Index: Elaboracao/index.md
       - Requisitos: Elaboracao/levreq.md
@@ -27,8 +27,6 @@ nav:
       - CodeSpace: Construcao/codespace.md
   - Transição:
       - Index: Transicao/index.md
-
-  - Bibliografia: Disciplina/Bibliografia.md
 
 extra_css:
   - css/extra.css
