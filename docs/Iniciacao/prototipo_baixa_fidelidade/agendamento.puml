@@ -1,0 +1,60 @@
+@startsalt
+
+{+
+    {* <b>Playmakerz - Agendamentos}
+
+    {
+        <b>Buscar agendamentos
+    }
+
+    {
+        <&calendar> Dia: | "dd/mm/aaaa"
+        <&person> Profissional: | "Carlos Mendes     "
+    }
+
+    {
+        [Filtrar] | [Limpar filtros]
+    }
+
+    --
+
+    {
+        <b>Lista de agendamentos
+    }
+
+    {
+        Dia: 15/09/2026
+        Horário: 08:00 - 09:00
+        Profissional: Carlos Mendes
+        [Ver detalhes]
+    }
+
+    --
+
+    {
+        Dia: 15/09/2026
+        Horário: 09:00 - 10:00
+        Profissional: Carlos Mendes
+        [Ver detalhes]
+    }
+
+    --
+
+    {
+        Dia: 16/09/2026
+        Horário: 14:00 - 15:00
+        Profissional: Carlos Mendes
+        [Ver detalhes]
+    }
+
+    --
+
+    {
+        Dia: 16/09/2026
+        Horário: 16:00 - 17:00
+        Profissional: Carlos Mendes
+        [Ver detalhes]
+    }
+}
+
+@endsalt
