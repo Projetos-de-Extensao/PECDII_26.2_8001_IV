@@ -1,0 +1,34 @@
+@startsalt
+
+{+
+    {* <b>Playmakerz - Login}
+
+    {
+        <b>Acesse sua conta
+    }
+
+    {
+        @ E-mail: | "exemplo@gmail.com           "
+        <&key> Senha: | "********                    "
+    }
+
+    {
+        [<&account-login> Entrar]
+        [Esqueci minha senha]
+    }
+
+    ..
+
+    {
+        Ainda não possui uma conta?
+        [<&person> Criar conta]
+    }
+
+    --
+
+    {
+        Login com: | [Google]
+    }
+}
+
+@endsalt
