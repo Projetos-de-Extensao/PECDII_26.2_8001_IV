@@ -1,0 +1,28 @@
+@startsalt
+
+{+
+    {* <b>Playmakerz - Cadastro}
+
+    {
+        <b>Crie sua conta
+    }
+
+    {
+        <&person> Nome: | "                         "
+        @ E-mail: | "exemplo@gmail.com        "
+        <&phone> Telefone: | "(00) 00000-0000          "
+        <&key> Senha: | "********                 "
+        <&key> Confirmar senha: | "********                 "
+        Tipo de usuário: | ^Atleta^
+    }
+
+    [X] Concordo com os Termos de Uso
+
+    ..
+
+    {
+        [<&person> Criar conta] | [Voltar]
+    }
+}
+
+@endsalt
