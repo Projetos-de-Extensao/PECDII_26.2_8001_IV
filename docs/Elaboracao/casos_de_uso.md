@@ -76,7 +76,7 @@ title: Casos de Uso
 - **Inativar usuário:** o gestor inativa a conta. O sistema impede novos acessos e mantém o histórico.
 
 **Fluxos de exceção**
-- ** Contato já cadastrado:** o sistema informa a duplicidade e não cria a conta.
+- **Contato já cadastrado:** o sistema informa a duplicidade e não cria a conta.
 - **Último gestor ativo:** o sistema impede a inativação ou a troca de perfil do último gestor.
 
 ---
@@ -100,8 +100,8 @@ title: Casos de Uso
 
 **Fluxos alternativos**
 - **Editar ou atualizar dados:** o usuário localiza o atleta, altera os campos permitidos ao seu perfil e salva. Atleta e responsável só editam os dados de contato do próprio atleta.
-- **A2 - Inativar atleta:** o usuário inativa o cadastro. O sistema mantém o histórico e impede novos agendamentos.
-- **A3 - Consultar dados sensíveis:** somente perfis autorizados visualizam esses campos.
+- **Inativar atleta:** o usuário inativa o cadastro. O sistema mantém o histórico e impede novos agendamentos.
+- **Consultar dados sensíveis:** somente perfis autorizados visualizam esses campos.
 
 **Fluxos de exceção**
 - **Atleta menor sem responsável:** o sistema impede salvar o cadastro.
@@ -347,7 +347,7 @@ title: Casos de Uso
 **Fluxos alternativos**
 - **Cancelar recorrência:** o usuário escolhe cancelar só esta ocorrência, esta e as seguintes ou toda a série.
 - **Cancelamento solicitado por atleta ou responsável:** o sistema registra o cancelamento e notifica a recepção. Se a academia definir prazo mínimo de antecedência, o sistema aplica a regra conforme definido em Premissas e pontos em aberto.
-- **A3 - Cancelamento em grupo:** o usuário cancela para todo o grupo ou remove apenas um participante.
+- **Cancelamento em grupo:** o usuário cancela para todo o grupo ou remove apenas um participante.
 
 **Fluxos de exceção**
 - **Agendamento já realizado ou já cancelado:** o sistema não permite a operação.
