@@ -4,7 +4,7 @@ title: Levantamento de Requisitos
 ---
 # **06 - Levantamento de Requisitos e Caso de Uso**
 
-**Sistema:** Sistema de Gestão da Playmakerz*)
+**Sistema:** Sistema de Gestão da Playmakerz
 
 ---
 
@@ -26,8 +26,8 @@ title: Levantamento de Requisitos
 | ID   | Descrição                                                                    | Prioridade |
 | ---- | ------------------------------------------------------------------------------ | ---------- |
 | RF01 | O usuário deve conseguir entrar no sistema com e-mail e senha. | Alta |
-| RF02 | O sistema deve permitir cadastrar atletas, responsáveis, profissionais e funcionários. | Alta 
-| RF03 | O cadastro de profissionais e funcionários deve depender de autorização da administração.  Média |
+| RF02 | O sistema deve permitir cadastrar atletas, responsáveis, profissionais e funcionários. | Alta |
+| RF03 | O cadastro de profissionais e funcionários deve depender de autorização da administração. | Média |
 | RF04 | O atleta menor de idade deve ser associado a um pai ou responsável. | Alta |
 | RF05 | A recepção deve registrar os documentos, a autorização do responsável e a entrega dos exames médicos do atleta. | Média |
 | RF06 | O sistema deve permitir cadastrar espaços e equipamentos. | Alta |
@@ -59,7 +59,7 @@ Os casos de uso do sistema estão em [Casos de Uso](casos_de_uso.md), com atores
 
 ---
 
-### **5. Protótipo **
+### **5. Protótipo**
 
 O protótipo de baixa fidelidade já foi feito na Iniciação:
  
