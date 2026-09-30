@@ -1,0 +1,43 @@
+@startuml casos_de_uso_consultas
+!pragma layout smetana
+title Casos de Uso: Consultas, Presença e Manutenção
+
+left to right direction
+skinparam actorStyle awesome
+skinparam shadowing false
+
+actor Gestor
+actor Coordenador
+actor Recepção
+actor Profissional
+actor Manutenção
+actor "Atleta ou Responsável" as Atleta
+
+rectangle "Sistema da Playmakerz" {
+  usecase "Consultar agenda" as CAG
+  usecase "Registrar presença\ne falta" as RP
+  usecase "Bloquear espaço ou equipamento\npara manutenção" as BM
+  usecase "Consultar ocupação\ndos espaços" as CO
+}
+
+Gestor --> CAG
+Coordenador --> CAG
+Recepção --> CAG
+Profissional --> CAG
+Atleta --> CAG
+
+Profissional --> RP
+Recepção --> RP
+Coordenador --> RP
+
+Manutenção --> BM
+Coordenador --> BM
+Gestor --> BM
+
+Gestor --> CO
+Coordenador --> CO
+Recepção --> CO
+Profissional --> CO
+Manutenção --> CO
+
+@enduml
