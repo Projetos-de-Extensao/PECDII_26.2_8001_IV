@@ -41,6 +41,8 @@ title: Levantamento de Requisitos
 | RF14 | O sistema deve permitir consultar a ocupação dos espaços. | Baixa |
 | RF15 | Cada usuário deve ver só o que o seu perfil permite (atleta e responsável veem só os próprios agendamentos, profissional vê a própria agenda). | Alta |
 | RF16 | O profissional deve conseguir registrar avaliações e observações do atleta e gerar relatório por atleta e período. (proposta, precisa ser validada) | Baixa |
+| RF17 | O sistema deve permitir remarcar um agendamento, liberando os recursos antigos e avisando os envolvidos. | Média |
+| RF18 | O gestor deve conseguir consultar o registro de alterações importantes do sistema. | Média |
 
 ### **3. Requisitos Não Funcionais**
 
@@ -51,27 +53,9 @@ title: Levantamento de Requisitos
 
 ---
 
-### **4. Exemplo de Caso de Uso**
+### **4. Casos de Uso**
 
-#### **UC01 - Realizar Agendamento**
-
-- **Atores:** Recepção, Sistema.
-- **Pré-condição:** Usuário está logado e tem permissão para agendar. Atleta, profissional, espaço e equipamentos já estão cadastrados.
-- **Fluxo Principal:**
-    1. Usuário escolhe o tipo de agendamento (individual ou em grupo).
-    2. Usuário seleciona o(s) atleta(s).
-    3. Usuário seleciona o profissional responsável.
-    4. Usuário informa a data e o horário de início e término.
-    5. Usuário seleciona o espaço e os equipamentos.
-    6. Usuário escolhe se o agendamento é único ou recorrente.
-    7. Usuário clica em "Verificar disponibilidade".
-    8. Sistema verifica atleta, profissional, espaço, equipamentos e bloqueios de manutenção.
-    9. Sistema informa que está tudo disponível e o usuário confirma.
-    10. Sistema registra o agendamento e envia a confirmação.
-- **Fluxos Alternativos:**
-    - **FA1:** Conflito de horário → Sistema informa qual item já está ocupado e pede outro horário ou outro item.
-    - **FA2:** Espaço ou equipamento em manutenção → Sistema informa que está indisponível e pede outra escolha.
-- **Pós-condição:** Agendamento registrado e visível para os usuários autorizados. Lembretes programados.
+Os casos de uso do sistema estão em [Casos de Uso](casos_de_uso.md), com atores, fluxo principal, fluxos alternativos e de exceção. O caso de uso central é o **Criar agendamento individual**, que reúne atleta, profissional, espaço e equipamento e verifica os conflitos de horário antes de confirmar.
 
 ---
 
