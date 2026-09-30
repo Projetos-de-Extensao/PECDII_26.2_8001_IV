@@ -1,0 +1,59 @@
+@startuml casos_de_uso_agendamentos
+!pragma layout smetana
+title Casos de Uso: Agendamentos
+
+left to right direction
+skinparam actorStyle awesome
+skinparam shadowing false
+
+actor Recepção
+actor Coordenador
+actor Gestor
+actor "Atleta ou Responsável" as Atleta
+actor Sistema
+
+rectangle "Sistema da Playmakerz" {
+  usecase "Criar agendamento\nindividual" as CI
+  usecase "Criar agendamento\nem grupo" as CG
+  usecase "Criar agendamento\nrecorrente" as CR
+  usecase "Remarcar agendamento" as RM
+  usecase "Cancelar agendamento" as CA
+  usecase "Verificar conflitos\nde horário" as VC
+  usecase "Enviar lembretes\ne avisos" as EL
+}
+
+Recepção --> CI
+Recepção --> CG
+Recepção --> CR
+Recepção --> RM
+Recepção --> CA
+
+Coordenador --> CI
+Coordenador --> CG
+Coordenador --> CR
+Coordenador --> RM
+Coordenador --> CA
+
+Gestor --> CI
+Gestor --> CG
+Gestor --> CR
+Gestor --> RM
+Gestor --> CA
+
+Atleta --> CA
+
+CI ..> VC : <<include>>
+CG ..> VC : <<include>>
+CR ..> VC : <<include>>
+RM ..> VC : <<include>>
+
+CI ..> EL : <<include>>
+CG ..> EL : <<include>>
+CR ..> EL : <<include>>
+RM ..> EL : <<include>>
+CA ..> EL : <<include>>
+
+VC --> Sistema
+EL --> Sistema
+
+@enduml

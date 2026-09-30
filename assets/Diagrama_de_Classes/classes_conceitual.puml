@@ -1,0 +1,100 @@
+@startuml classes_conceitual
+!pragma layout smetana
+title Playmakerz: Diagrama de Classes Conceitual (v0.2)
+
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam classBackgroundColor #FFFFFF
+skinparam classBorderColor #1F3A5F
+skinparam ArrowColor #1F3A5F
+skinparam NoteBackgroundColor #FFF8DC
+hide empty methods
+hide circle
+
+abstract class Usuario {
+  nome
+  email
+  telefone
+}
+
+class Atleta {
+  dataDeNascimento
+  objetivos
+}
+
+class Responsavel {
+  parentesco
+}
+
+class Profissional {
+  especialidade
+}
+
+class Funcionario {
+  cargo
+}
+
+class Espaco {
+  nome
+  tipo
+  capacidade
+}
+
+class Equipamento {
+  nome
+  tipo
+}
+
+class Agendamento {
+  data
+  horarioDeInicio
+  horarioDeTermino
+  tipo
+  situacao
+}
+
+class Recorrencia {
+  frequencia
+  dataDeTermino
+}
+
+class Presenca {
+  situacao
+}
+
+class Notificacao {
+  tipo
+  mensagem
+  dataDeEnvio
+}
+
+Usuario <|-- Atleta
+Usuario <|-- Responsavel
+Usuario <|-- Profissional
+Usuario <|-- Funcionario
+
+Atleta "*" -- "0..*" Responsavel : e responsavel por <
+
+Agendamento "*" -- "1..*" Atleta : participantes
+(Agendamento, Atleta) .. Presenca
+Agendamento "*" -- "1" Profissional : conduzido por >
+Agendamento "*" -- "1" Espaco : ocorre em >
+Agendamento "*" -- "0..*" Equipamento : utiliza >
+Agendamento "*" -- "0..1" Recorrencia : pertence a >
+Agendamento "*" -- "1" Funcionario : registrado por >
+
+Notificacao "*" -- "1" Usuario : destinatario >
+Notificacao "*" -- "0..1" Agendamento : refere-se a >
+
+note bottom of Agendamento
+  Um Atleta, Profissional, Espaco ou
+  Equipamento nao pode estar em dois
+  Agendamentos no mesmo horario.
+end note
+
+note bottom of Atleta
+  Atleta menor de idade precisa
+  de pelo menos um Responsavel.
+end note
+
+@enduml

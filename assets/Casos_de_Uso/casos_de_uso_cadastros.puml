@@ -1,0 +1,43 @@
+@startuml casos_de_uso_cadastros
+!pragma layout smetana
+title Casos de Uso: Acesso e Cadastros
+
+left to right direction
+skinparam actorStyle awesome
+skinparam shadowing false
+
+actor "Todos os usuários" as Todos
+actor Gestor
+actor Coordenador
+actor Recepção
+actor "Atleta ou Responsável" as Atleta
+
+rectangle "Sistema da Playmakerz" {
+  usecase "Autenticar usuário" as AU
+  usecase "Gerenciar usuários e\nperfis de permissão" as GU
+  usecase "Gerenciar atletas" as GA
+  usecase "Gerenciar profissionais" as GP
+  usecase "Gerenciar espaços" as GE
+  usecase "Gerenciar equipamentos" as GQ
+  usecase "Consultar registro\nde alterações" as RA
+}
+
+Todos --> AU
+
+Gestor --> GU
+Gestor --> GA
+Gestor --> GP
+Gestor --> GE
+Gestor --> GQ
+Gestor --> RA
+
+Coordenador --> GA
+Coordenador --> GP
+Coordenador --> GE
+Coordenador --> GQ
+
+Recepção --> GA
+
+Atleta --> GA
+
+@enduml
