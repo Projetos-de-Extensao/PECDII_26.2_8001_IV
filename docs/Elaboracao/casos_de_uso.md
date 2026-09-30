@@ -507,3 +507,31 @@ title: Casos de Uso
 
 **Fluxos de exceção**
 - **Usuário sem permissão:** o sistema nega o acesso.
+
+---
+
+## 4. Diagrama de Casos de Uso
+
+Os diagramas abaixo mostram os atores e os casos de uso descritos na seção 3. Foram divididos em três para ficarem fáceis de ler. Neles, "Atleta ou Responsável" representa os dois atores, que têm a mesma visão restrita.
+
+### 4.1 Acesso e Cadastros
+
+![Casos de Uso: Acesso e Cadastros](../assets/Casos_de_Uso/casos_de_uso_cadastros.png)
+
+Fonte: [`casos_de_uso_cadastros.puml`](../assets/Casos_de_Uso/casos_de_uso_cadastros.puml)
+
+### 4.2 Agendamentos
+
+Criar (individual, em grupo e recorrente) e remarcar agendamento incluem (`<<include>>`) a verificação de conflitos de horário e o envio de lembretes e avisos, como indicado no campo "Inclui" de cada caso de uso. Cancelar agendamento inclui o envio de lembretes e avisos.
+
+![Casos de Uso: Agendamentos](../assets/Casos_de_Uso/casos_de_uso_agendamentos.png)
+
+Fonte: [`casos_de_uso_agendamentos.puml`](../assets/Casos_de_Uso/casos_de_uso_agendamentos.puml)
+
+### 4.3 Consultas, Presença e Manutenção
+
+Quando existem agendamentos no período de um bloqueio, "Bloquear espaço ou equipamento para manutenção" leva a Remarcar agendamento e a Enviar lembretes e avisos, como descrito na especificação do caso de uso.
+
+![Casos de Uso: Consultas, Presença e Manutenção](../assets/Casos_de_Uso/casos_de_uso_consultas.png)
+
+Fonte: [`casos_de_uso_consultas.puml`](../assets/Casos_de_Uso/casos_de_uso_consultas.puml)
