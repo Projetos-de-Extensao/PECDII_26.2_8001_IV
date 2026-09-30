@@ -4,24 +4,75 @@
 
 ### Login
 
-Campo: E-mail  
-Campo: Senha  
-Botão: Entrar  
-Botão: Criar conta  
-Link: Esqueci minha senha  
+```plantuml
+@startsalt
 
+{+
+    {* <b>Playmakerz - Login}
+
+    {
+        <b>Acesse sua conta
+    }
+
+    {
+        @ E-mail: | "exemplo@gmail.com           "
+        <&key> Senha: | "********                    "
+    }
+
+    {
+        [<&account-login> Entrar]
+        [Esqueci minha senha]
+    }
+
+    ..
+
+    {
+        Ainda não possui uma conta?
+        [<&person> Criar conta]
+    }
+
+    --
+
+    {
+        Login com: | [Google]
+    }
+}
+
+@endsalt
+```
 Observação: cada usuário deverá ter acesso somente às informações necessárias para sua função, visando proteger dados pessoais e sensíveis.
 
 ### Cadastro
+```plantuml
+@startsalt
 
-Campo: Nome  
-Campo: E-mail  
-Campo: Telefone  
-Campo: Senha  
-Campo: Confirmar senha  
-Seleção: Tipo de usuário  
-Botão: Cadastrar  
+{+
+    {* <b>Playmakerz - Cadastro}
 
+    {
+        <b>Crie sua conta
+    }
+
+    {
+        <&person> Nome: | "                         "
+        @ E-mail: | "exemplo@gmail.com        "
+        <&phone> Telefone: | "(00) 00000-0000          "
+        <&key> Senha: | "********                 "
+        <&key> Confirmar senha: | "********                 "
+        Tipo de usuário: | ^Atleta^
+    }
+
+    [X] Concordo com os Termos de Uso
+
+    ..
+
+    {
+        [<&person> Criar conta] | [Voltar]
+    }
+}
+
+@endsalt
+```
 Observação: para atletas menores de idade, deverá ser considerada a associação da conta a um pai ou responsável.
 
 Observação: o cadastro e as permissões de determinados perfis, principalmente funcionários e profissionais, poderão depender de autorização da administração.
@@ -29,18 +80,68 @@ Observação: o cadastro e as permissões de determinados perfis, principalmente
 ---
 
 ## Tela 2 — Informações de Agendamento
+```plantuml
+@startsalt
 
-Cabeçalho: identificação do usuário e acesso aos seus agendamentos  
-Seleção: tipo de agendamento — individual ou em grupo  
-Seleção: atleta ou atletas participantes  
-Seleção: profissional responsável  
-Campo: data do atendimento  
-Campo: horário de início e término  
-Seleção: espaço onde será realizado o atendimento  
-Seleção: equipamentos necessários  
-Seleção: repetição do agendamento — único ou recorrente  
-Botão: Verificar disponibilidade  
+{+
+    {* <b>Playmakerz - Agendamentos}
 
+    {
+        <b>Buscar agendamentos
+    }
+
+    {
+        <&calendar> Dia: | "dd/mm/aaaa"
+        <&person> Profissional: | "Carlos Mendes     "
+    }
+
+    {
+        [Filtrar] | [Limpar filtros]
+    }
+
+    --
+
+    {
+        <b>Lista de agendamentos
+    }
+
+    {
+        Dia: 15/09/2026
+        Horário: 08:00 - 09:00
+        Profissional: Carlos Mendes
+        [Ver detalhes]
+    }
+
+    --
+
+    {
+        Dia: 15/09/2026
+        Horário: 09:00 - 10:00
+        Profissional: Carlos Mendes
+        [Ver detalhes]
+    }
+
+    --
+
+    {
+        Dia: 16/09/2026
+        Horário: 14:00 - 15:00
+        Profissional: Carlos Mendes
+        [Ver detalhes]
+    }
+
+    --
+
+    {
+        Dia: 16/09/2026
+        Horário: 16:00 - 17:00
+        Profissional: Carlos Mendes
+        [Ver detalhes]
+    }
+}
+
+@endsalt
+```
 ### Verificação do Agendamento
 
 Antes da confirmação, o sistema deverá verificar se os elementos envolvidos no atendimento estão disponíveis durante o período selecionado.
