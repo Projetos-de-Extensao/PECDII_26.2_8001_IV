@@ -538,4 +538,4 @@ Fonte: [`casos_de_uso_consultas.puml`](../assets/Casos_de_Uso/casos_de_uso_consu
 
 | Versão | Data       | Autor(es)                | Revisor(es) | Resumo da alteração                       |
 | ------ | ---------- | ------------------------ | ----------- | ----------------------------------------- |
-| v0.1   | 30/09/2026 | Pedro Henrique Marques Loredo de Paula | pendente    | Criação do Diagrama de Classes de uso |
+| v0.1   | 29/09/2026 | Pedro Henrique Marques Loredo de Paula | Marcus    | Criação do Diagrama de Classes de uso |
