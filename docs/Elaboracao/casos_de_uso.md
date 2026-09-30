@@ -535,3 +535,7 @@ Quando existem agendamentos no período de um bloqueio, "Bloquear espaço ou equ
 ![Casos de Uso: Consultas, Presença e Manutenção](../assets/Casos_de_Uso/casos_de_uso_consultas.png)
 
 Fonte: [`casos_de_uso_consultas.puml`](../assets/Casos_de_Uso/casos_de_uso_consultas.puml)
+
+| Versão | Data       | Autor(es)                | Revisor(es) | Resumo da alteração                       |
+| ------ | ---------- | ------------------------ | ----------- | ----------------------------------------- |
+| v0.1   | 30/09/2026 | Pedro Henrique MArques Loredo de Paula | pendente    | Criação do Diagrama de Classes de uso |
