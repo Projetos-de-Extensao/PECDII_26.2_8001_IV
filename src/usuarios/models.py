@@ -5,6 +5,15 @@ from django.db import models
 from django.utils import timezone
 
 
+def validar_telefone_informado(telefone):
+    """Verifica se o telefone possui pelo menos 11 dígitos."""
+    numeros = "".join(
+        caractere for caractere in telefone
+        if caractere.isdigit()
+    )
+    return len(numeros) >= 11
+
+
 class Usuario(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL,
@@ -20,17 +29,14 @@ class Usuario(models.Model):
     def clean(self):
         super().clean()
 
-        if self.telefone:
-            numeros = "".join(i for i in self.telefone if i.isdigit()
-                              )
-            if len(numeros) < 11:
-                raise ValidationError({
-                    "telefone":
-                    "O telefone deve conter pelo menos 11 dígitos."
-                })
-            
+        if self.telefone and not validar_telefone_informado(self.telefone):
+            raise ValidationError({
+                "telefone": "O telefone deve conter pelo menos 11 dígitos."
+            })
+
     def __str__(self):
         return self.user.get_full_name() or self.user.username
+
 
 class Responsavel(models.Model):
     usuario = models.OneToOneField(
@@ -39,18 +45,43 @@ class Responsavel(models.Model):
         related_name="responsavel"
     )
 
+    telefone = models.CharField(
+        max_length=20,
+        blank=True
+    )
+
+    def clean(self):
+        super().clean()
+
+        if self.telefone and not validar_telefone_informado(self.telefone):
+            raise ValidationError({
+                "telefone": "O telefone deve conter pelo menos 11 dígitos."
+            })
+
     def __str__(self):
         return str(self.usuario)
 
 
 class Atleta(models.Model):
+    nome = models.CharField(max_length=150)
+
     usuario = models.OneToOneField(
         Usuario,
         on_delete=models.PROTECT,
-        related_name="atleta"
+        related_name="atleta",
+        null=True,
+        blank=True
     )
 
-    data_de_nascimento = models.DateField()
+    data_de_nascimento = models.DateField(
+        null=True,
+        blank=True
+    )
+
+    telefone = models.CharField(
+        max_length=20,
+        blank=True
+    )
 
     objetivos = models.TextField(blank=True)
 
@@ -66,35 +97,61 @@ class Atleta(models.Model):
 
     @property
     def idade(self):
+        if self.data_de_nascimento is None:
+            return None
+
         hoje = timezone.localdate()
         nascimento = self.data_de_nascimento
 
         return (
             hoje.year - nascimento.year
-            - ((hoje.month, hoje.day)
-               < (nascimento.month, nascimento.day))
+            - ((hoje.month, hoje.day) < (nascimento.month, nascimento.day))
         )
 
     def clean(self):
         super().clean()
 
+        if (
+            self.data_de_nascimento is not None
+            and self.data_de_nascimento > timezone.localdate()
+        ):
+            raise ValidationError({
+                "data_de_nascimento": "A data de nascimento não pode ser futura."
+            })
+
+        if self.telefone and not validar_telefone_informado(self.telefone):
+            raise ValidationError({
+                "telefone": "O telefone deve conter pelo menos 11 dígitos."
+            })
+
+    def validar_para_agendamento(self):
+        """Verifica se o atleta está apto a realizar agendamentos."""
+
+        self.full_clean()
+
+        erros = {}
+
+        if self.pk is None:
+            erros["__all__"] = (
+                "Salve o cadastro do atleta antes de agendar."
+            )
+
         if self.data_de_nascimento is None:
-            return
+            erros["data_de_nascimento"] = (
+                "Informe a data de nascimento antes de agendar."
+            )
 
-        if self.data_de_nascimento > timezone.localdate():
-            raise ValidationError({
-                "data_de_nascimento":
-                "A data de nascimento não pode ser futura."
-            })
+        elif self.idade < 18 and self.responsavel_id is None:
+            erros["responsavel"] = (
+                "Atletas menores de 18 anos precisam de um responsável "
+                "para realizar agendamentos."
+            )
 
-        if self.idade < 18 and self.responsavel_id is None:
-            raise ValidationError({
-                "responsavel":
-                "Atletas menores de idade precisam de um responsável."
-            })
+        if erros:
+            raise ValidationError(erros)
 
     def __str__(self):
-        return str(self.usuario)
+        return self.nome
 
 
 class Profissional(models.Model):
@@ -160,6 +217,5 @@ class DisponibilidadeProfissional(models.Model):
             and self.hora_fim <= self.hora_inicio
         ):
             raise ValidationError({
-                "hora_fim":
-                "O horário final deve ser posterior ao inicial."
+                "hora_fim": "O horário final deve ser posterior ao inicial."
             })
