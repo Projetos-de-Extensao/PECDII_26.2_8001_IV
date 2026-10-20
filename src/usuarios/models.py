@@ -125,3 +125,41 @@ class Funcionario(models.Model):
 
     def __str__(self):
         return f"{self.usuario} - {self.cargo}"
+
+
+class DisponibilidadeProfissional(models.Model):
+    DIAS_SEMANA = [
+        (0, "Segunda-feira"),
+        (1, "Terça-feira"),
+        (2, "Quarta-feira"),
+        (3, "Quinta-feira"),
+        (4, "Sexta-feira"),
+        (5, "Sábado"),
+        (6, "Domingo"),
+    ]
+
+    profissional = models.ForeignKey(
+        Profissional,
+        on_delete=models.CASCADE,
+        related_name="disponibilidades"
+    )
+
+    dia_semana = models.IntegerField(
+        choices=DIAS_SEMANA
+    )
+
+    hora_inicio = models.TimeField()
+    hora_fim = models.TimeField()
+
+    def clean(self):
+        super().clean()
+
+        if (
+            self.hora_inicio is not None
+            and self.hora_fim is not None
+            and self.hora_fim <= self.hora_inicio
+        ):
+            raise ValidationError({
+                "hora_fim":
+                "O horário final deve ser posterior ao inicial."
+            })
