@@ -22,6 +22,8 @@ class Agendamento(models.Model):
     atletas = models.ManyToManyField(
         "usuarios.Atleta",
         related_name="agendamentos",
+        through="ParticipacaoAgendamento",
+        through_fields=("agendamento", "atleta"),
     )
     equipamentos = models.ManyToManyField(
         "app.Equipamento",
@@ -41,6 +43,8 @@ class Agendamento(models.Model):
         default=Situacao.AGENDADO,
     )
     observacoes = models.TextField(blank=True)
+    motivo_cancelamento = models.TextField(blank=True)
+    cancelado_em = models.DateTimeField(null=True, blank=True)
     criado_em = models.DateTimeField(auto_now_add=True)
     atualizado_em = models.DateTimeField(auto_now=True)
 
@@ -99,3 +103,48 @@ class Agendamento(models.Model):
             f"{self.inicio:%d/%m/%Y %H:%M} - "
             f"{self.profissional} - {self.espaco}"
         )
+
+
+class ParticipacaoAgendamento(models.Model):
+    class Situacao(models.TextChoices):
+        CONFIRMADA = "confirmada", "Confirmada"
+        CANCELADA = "cancelada", "Cancelada"
+        PRESENTE = "presente", "Presente"
+        FALTA = "falta", "Falta"
+        FALTA_JUSTIFICADA = "falta_justificada", "Falta justificada"
+
+    agendamento = models.ForeignKey(
+        Agendamento,
+        on_delete=models.CASCADE,
+        related_name="participacoes",
+    )
+    atleta = models.ForeignKey(
+        "usuarios.Atleta",
+        on_delete=models.PROTECT,
+        related_name="participacoes_agendamento",
+    )
+    situacao = models.CharField(
+        max_length=20,
+        choices=Situacao.choices,
+        default=Situacao.CONFIRMADA,
+    )
+    observacoes = models.TextField(blank=True)
+    motivo_cancelamento = models.TextField(blank=True)
+    cancelado_em = models.DateTimeField(null=True, blank=True)
+    criado_em = models.DateTimeField(auto_now_add=True)
+    atualizado_em = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ("agendamento", "atleta")
+        constraints = [
+            models.UniqueConstraint(
+                fields=("agendamento", "atleta"),
+                name="participacao_unica_por_agendamento_atleta",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=("atleta", "situacao")),
+        ]
+
+    def __str__(self):
+        return f"{self.atleta} - {self.get_situacao_display()}"

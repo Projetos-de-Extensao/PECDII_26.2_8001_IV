@@ -2,6 +2,7 @@ from datetime import date, datetime, time
 
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.db import IntegrityError, transaction
 from django.test import TestCase
 from django.utils import timezone
 
@@ -15,8 +16,12 @@ from usuarios.models import (
     Usuario,
 )
 
-from .models import Agendamento
-from .services import criar_agendamento
+from .models import Agendamento, ParticipacaoAgendamento
+from .services import (
+    cancelar_agendamento,
+    cancelar_participacao,
+    criar_agendamento,
+)
 
 
 def criar_usuario(username):
@@ -99,6 +104,12 @@ class CriarAgendamentoTests(TestCase):
             [self.equipamento],
         )
         self.assertEqual(agendamento.observacoes, "Primeira avaliação")
+        participacao = agendamento.participacoes.get()
+        self.assertEqual(participacao.atleta, self.atleta)
+        self.assertEqual(
+            participacao.situacao,
+            ParticipacaoAgendamento.Situacao.CONFIRMADA,
+        )
 
     def test_cria_agendamento_em_grupo_dentro_da_capacidade(self):
         agendamento = self.criar(
@@ -113,6 +124,25 @@ class CriarAgendamentoTests(TestCase):
 
         self.assertIn("atletas", contexto.exception.message_dict)
         self.assertEqual(Agendamento.objects.count(), 0)
+
+    def test_rejeita_atleta_repetido(self):
+        with self.assertRaises(ValidationError) as contexto:
+            self.criar(atletas=[self.atleta, self.atleta])
+
+        self.assertIn("atletas", contexto.exception.message_dict)
+        self.assertEqual(Agendamento.objects.count(), 0)
+
+    def test_banco_impede_participacao_repetida(self):
+        agendamento = self.criar()
+
+        with self.assertRaises(IntegrityError):
+            with transaction.atomic():
+                ParticipacaoAgendamento.objects.create(
+                    agendamento=agendamento,
+                    atleta=self.atleta,
+                )
+
+        self.assertEqual(agendamento.participacoes.count(), 1)
 
     def test_rejeita_capacidade_excedida(self):
         terceiro = Atleta.objects.create(
@@ -220,8 +250,10 @@ class CriarAgendamentoTests(TestCase):
 
     def test_cancelado_nao_bloqueia_novo_agendamento(self):
         primeiro = self.criar()
-        primeiro.situacao = Agendamento.Situacao.CANCELADO
-        primeiro.save(update_fields=["situacao"])
+        cancelar_agendamento(
+            agendamento=primeiro,
+            motivo="Cancelado pela recepção.",
+        )
 
         segundo = self.criar()
 
@@ -241,6 +273,123 @@ class CriarAgendamentoTests(TestCase):
             set(contexto.exception.message_dict),
             {"atletas"},
         )
+
+    def test_cancelar_participante_de_grupo_mantem_agendamento(self):
+        primeiro = self.criar(atletas=[self.atleta, self.outro_atleta])
+        participacao = primeiro.participacoes.get(atleta=self.atleta)
+        cancelar_participacao(
+            participacao=participacao,
+            motivo="Atleta não poderá comparecer.",
+        )
+
+        primeiro.refresh_from_db()
+        participacao.refresh_from_db()
+        self.assertEqual(
+            primeiro.situacao,
+            Agendamento.Situacao.AGENDADO,
+        )
+        self.assertEqual(
+            participacao.situacao,
+            ParticipacaoAgendamento.Situacao.CANCELADA,
+        )
+        self.assertIsNotNone(participacao.cancelado_em)
+
+        segundo = self.criar(
+            profissional=self._outro_profissional(),
+            espaco=self.outro_espaco,
+            equipamentos=[self.outro_equipamento],
+        )
+
+        self.assertEqual(list(segundo.atletas.all()), [self.atleta])
+
+    def test_cancelar_participacao_individual_cancela_agendamento(self):
+        primeiro = self.criar()
+        participacao = primeiro.participacoes.get()
+
+        cancelado = cancelar_participacao(
+            participacao=participacao,
+            motivo="Atleta solicitou o cancelamento.",
+        )
+
+        participacao.refresh_from_db()
+        self.assertEqual(
+            cancelado.situacao,
+            Agendamento.Situacao.CANCELADO,
+        )
+        self.assertEqual(
+            participacao.situacao,
+            ParticipacaoAgendamento.Situacao.CANCELADA,
+        )
+        self.assertEqual(
+            cancelado.motivo_cancelamento,
+            "Atleta solicitou o cancelamento.",
+        )
+        self.assertIsNotNone(cancelado.cancelado_em)
+
+        segundo = self.criar()
+        self.assertNotEqual(primeiro.pk, segundo.pk)
+
+    def test_ultimo_cancelamento_do_grupo_cancela_agendamento(self):
+        agendamento = self.criar(
+            atletas=[self.atleta, self.outro_atleta]
+        )
+        cancelar_participacao(
+            participacao=agendamento.participacoes.get(atleta=self.atleta)
+        )
+
+        agendamento.refresh_from_db()
+        self.assertEqual(
+            agendamento.situacao,
+            Agendamento.Situacao.AGENDADO,
+        )
+
+        cancelar_participacao(
+            participacao=agendamento.participacoes.get(
+                atleta=self.outro_atleta
+            )
+        )
+
+        agendamento.refresh_from_db()
+        self.assertEqual(
+            agendamento.situacao,
+            Agendamento.Situacao.CANCELADO,
+        )
+
+    def test_cancelar_agendamento_cancela_todos_os_confirmados(self):
+        agendamento = self.criar(
+            atletas=[self.atleta, self.outro_atleta]
+        )
+
+        cancelado = cancelar_agendamento(
+            agendamento=agendamento,
+            motivo="Professor indisponível.",
+        )
+
+        self.assertEqual(
+            cancelado.situacao,
+            Agendamento.Situacao.CANCELADO,
+        )
+        self.assertEqual(
+            cancelado.participacoes.filter(
+                situacao=ParticipacaoAgendamento.Situacao.CANCELADA
+            ).count(),
+            2,
+        )
+        self.assertFalse(
+            cancelado.participacoes.exclude(
+                motivo_cancelamento="Professor indisponível."
+            ).exists()
+        )
+
+    def test_nao_cancela_agendamento_realizado(self):
+        agendamento = self.criar()
+        agendamento.situacao = Agendamento.Situacao.REALIZADO
+        agendamento.save(update_fields=["situacao"])
+
+        with self.assertRaises(ValidationError) as contexto:
+            cancelar_agendamento(agendamento=agendamento)
+
+        self.assertIn("situacao", contexto.exception.message_dict)
 
     def _outro_profissional(self):
         profissional = Profissional.objects.create(

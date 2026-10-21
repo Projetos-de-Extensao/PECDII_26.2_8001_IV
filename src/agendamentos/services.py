@@ -2,7 +2,7 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.utils import timezone
 
-from .models import Agendamento
+from .models import Agendamento, ParticipacaoAgendamento
 
 
 def _adicionar_erro(erros, campo, mensagem):
@@ -17,6 +17,14 @@ def _validar_atletas(atletas, espaco, erros):
             "Informe pelo menos um atleta.",
         )
         return
+
+    ids_informados = [atleta.pk for atleta in atletas if atleta.pk is not None]
+    if len(ids_informados) != len(set(ids_informados)):
+        _adicionar_erro(
+            erros,
+            "atletas",
+            "Não repita o mesmo atleta no agendamento.",
+        )
 
     if len(atletas) > espaco.capacidade:
         _adicionar_erro(
@@ -102,7 +110,17 @@ def _validar_conflitos(
             "O espaço já possui um agendamento nesse horário.",
         )
 
-    if atletas and sobrepostos.filter(atletas__in=atletas).exists():
+    situacoes_ativas = (
+        ParticipacaoAgendamento.Situacao.CONFIRMADA,
+        ParticipacaoAgendamento.Situacao.PRESENTE,
+        ParticipacaoAgendamento.Situacao.FALTA,
+        ParticipacaoAgendamento.Situacao.FALTA_JUSTIFICADA,
+    )
+
+    if atletas and sobrepostos.filter(
+        participacoes__atleta__in=atletas,
+        participacoes__situacao__in=situacoes_ativas,
+    ).exists():
         _adicionar_erro(
             erros,
             "atletas",
@@ -167,6 +185,129 @@ def criar_agendamento(
         raise ValidationError(erros)
 
     agendamento.save()
-    agendamento.atletas.set(atletas)
+    ParticipacaoAgendamento.objects.bulk_create(
+        ParticipacaoAgendamento(
+            agendamento=agendamento,
+            atleta=atleta,
+        )
+        for atleta in atletas
+    )
     agendamento.equipamentos.set(equipamentos)
+    return agendamento
+
+
+@transaction.atomic
+def cancelar_participacao(*, participacao, motivo=""):
+    """Cancela um atleta e encerra o agendamento se ele ficar vazio."""
+    if participacao.pk is None:
+        raise ValidationError({
+            "participacao": "A participação precisa estar salva para cancelar."
+        })
+
+    agendamento = Agendamento.objects.select_for_update().get(
+        pk=participacao.agendamento_id
+    )
+    participacao = ParticipacaoAgendamento.objects.select_for_update().get(
+        pk=participacao.pk
+    )
+
+    if participacao.situacao == ParticipacaoAgendamento.Situacao.CANCELADA:
+        return agendamento
+
+    if agendamento.situacao != Agendamento.Situacao.AGENDADO:
+        raise ValidationError({
+            "situacao": "Somente agendamentos ativos podem ser cancelados."
+        })
+
+    if participacao.situacao != ParticipacaoAgendamento.Situacao.CONFIRMADA:
+        raise ValidationError({
+            "situacao": (
+                "Somente uma participação confirmada pode ser cancelada."
+            )
+        })
+
+    agora = timezone.now()
+    participacao.situacao = ParticipacaoAgendamento.Situacao.CANCELADA
+    participacao.motivo_cancelamento = motivo
+    participacao.cancelado_em = agora
+    participacao.save(update_fields=[
+        "situacao",
+        "motivo_cancelamento",
+        "cancelado_em",
+        "atualizado_em",
+    ])
+
+    possui_outros_participantes = agendamento.participacoes.exclude(
+        situacao=ParticipacaoAgendamento.Situacao.CANCELADA
+    ).exists()
+
+    if not possui_outros_participantes:
+        agendamento.situacao = Agendamento.Situacao.CANCELADO
+        agendamento.motivo_cancelamento = (
+            motivo or "Todos os participantes cancelaram."
+        )
+        agendamento.cancelado_em = agora
+        agendamento.save(update_fields=[
+            "situacao",
+            "motivo_cancelamento",
+            "cancelado_em",
+            "atualizado_em",
+        ])
+
+    return agendamento
+
+
+@transaction.atomic
+def cancelar_agendamento(*, agendamento, motivo=""):
+    """Cancela o atendimento inteiro e suas participações confirmadas."""
+    if agendamento.pk is None:
+        raise ValidationError({
+            "agendamento": "O agendamento precisa estar salvo para cancelar."
+        })
+
+    agendamento = Agendamento.objects.select_for_update().get(
+        pk=agendamento.pk
+    )
+
+    if agendamento.situacao == Agendamento.Situacao.CANCELADO:
+        return agendamento
+
+    if agendamento.situacao != Agendamento.Situacao.AGENDADO:
+        raise ValidationError({
+            "situacao": "Somente agendamentos ativos podem ser cancelados."
+        })
+
+    participacoes = agendamento.participacoes.select_for_update()
+    if participacoes.exclude(
+        situacao__in=(
+            ParticipacaoAgendamento.Situacao.CONFIRMADA,
+            ParticipacaoAgendamento.Situacao.CANCELADA,
+        )
+    ).exists():
+        raise ValidationError({
+            "situacao": (
+                "O agendamento possui presença ou falta registrada e não "
+                "pode ser cancelado."
+            )
+        })
+
+    agora = timezone.now()
+    participacoes.filter(
+        situacao=ParticipacaoAgendamento.Situacao.CONFIRMADA
+    ).update(
+        situacao=ParticipacaoAgendamento.Situacao.CANCELADA,
+        motivo_cancelamento=motivo,
+        cancelado_em=agora,
+        atualizado_em=agora,
+    )
+
+    agendamento.situacao = Agendamento.Situacao.CANCELADO
+    agendamento.motivo_cancelamento = motivo
+    agendamento.cancelado_em = agora
+    agendamento.save(update_fields=[
+        "situacao",
+        "motivo_cancelamento",
+        "cancelado_em",
+        "atualizado_em",
+    ])
     return agendamento
