@@ -1,0 +1,68 @@
+{% extends "agendamentos/base.html" %}
+
+{% block title %}Agenda{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Visão geral</p>
+        <h1>Agendamentos</h1>
+        <p>Confira aulas individuais e em grupo registradas no sistema.</p>
+    </div>
+    <a class="button" href="{% url 'agendamentos:novo' %}">+ Novo agendamento</a>
+</section>
+
+{% if agendamentos %}
+    <div class="table-card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Data e horário</th>
+                    <th>Profissional</th>
+                    <th>Espaço</th>
+                    <th>Modalidade</th>
+                    <th>Participantes</th>
+                    <th>Situação</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for agendamento in agendamentos %}
+                    <tr>
+                        <td>
+                            <strong>{{ agendamento.inicio|date:"d/m/Y" }}</strong><br>
+                            {{ agendamento.inicio|date:"H:i" }}–{{ agendamento.fim|date:"H:i" }}
+                        </td>
+                        <td>{{ agendamento.profissional }}</td>
+                        <td>{{ agendamento.espaco }}</td>
+                        <td>
+                            {{ agendamento.get_modalidade_display }}
+                            {% if agendamento.modalidade == "grupo" %}
+                                <span class="capacity-count">{{ agendamento.inscritos_ativos }}:{{ agendamento.limite_participantes }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% for participacao in agendamento.participacoes.all %}
+                                {% if participacao.situacao != "cancelada" %}
+                                    <span class="person-chip">{{ participacao.atleta.nome }}</span>
+                                {% endif %}
+                            {% empty %}
+                                —
+                            {% endfor %}
+                        </td>
+                        <td><span class="status status-{{ agendamento.situacao }}">{{ agendamento.get_situacao_display }}</span></td>
+                        <td><a class="link" href="{% url 'agendamentos:detalhe' agendamento.id %}">Ver detalhes</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <section class="empty-state card">
+        <div class="empty-icon">📅</div>
+        <h2>Nenhum agendamento ainda</h2>
+        <p>Crie o primeiro para conferir as validações do sistema.</p>
+        <a class="button" href="{% url 'agendamentos:novo' %}">Criar agendamento</a>
+    </section>
+{% endif %}
+{% endblock %}

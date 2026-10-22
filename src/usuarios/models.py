@@ -1,8 +1,32 @@
+from datetime import time
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
+
+
+JANELAS_HORARIO_PROFISSIONAL = (
+    (time(7, 0), time(12, 0)),
+    (time(13, 0), time(20, 0)),
+)
+
+
+def periodo_dentro_horario_profissional(hora_inicio, hora_fim):
+    """Indica se o período cabe por inteiro em uma janela de atendimento."""
+    return any(
+        hora_inicio >= inicio_janela and hora_fim <= fim_janela
+        for inicio_janela, fim_janela in JANELAS_HORARIO_PROFISSIONAL
+    )
+
+
+def horario_alinhado_a_meia_hora(horario):
+    """Aceita somente horários cheios ou na metade da hora."""
+    return (
+        horario.minute in (0, 30)
+        and horario.second == 0
+        and horario.microsecond == 0
+    )
 
 
 def validar_telefone_informado(telefone):
@@ -64,6 +88,8 @@ class Responsavel(models.Model):
 
 class Atleta(models.Model):
     nome = models.CharField(max_length=150)
+
+    email = models.EmailField(blank=True)
 
     usuario = models.OneToOneField(
         Usuario,
@@ -150,6 +176,23 @@ class Atleta(models.Model):
         if erros:
             raise ValidationError(erros)
 
+    def validar_para_aula_experimental(self):
+        """Exige os dados de contato necessários para uma experimental."""
+        self.validar_para_agendamento()
+
+        erros = {}
+        if not self.email:
+            erros["email"] = (
+                "Informe o e-mail do interessado para a aula experimental."
+            )
+        if not self.telefone:
+            erros["telefone"] = (
+                "Informe o telefone do interessado para a aula experimental."
+            )
+
+        if erros:
+            raise ValidationError(erros)
+
     def __str__(self):
         return self.nome
 
@@ -211,11 +254,37 @@ class DisponibilidadeProfissional(models.Model):
     def clean(self):
         super().clean()
 
+        if self.hora_inicio is None or self.hora_fim is None:
+            return
+
+        erros = {}
+
+        if self.hora_fim <= self.hora_inicio:
+            erros["hora_fim"] = (
+                "O horário final deve ser posterior ao inicial."
+            )
+
+        if not horario_alinhado_a_meia_hora(self.hora_inicio):
+            erros["hora_inicio"] = (
+                "Escolha um horário em intervalos de 30 minutos."
+            )
+
+        if not horario_alinhado_a_meia_hora(self.hora_fim):
+            erros["hora_fim"] = (
+                "Escolha um horário em intervalos de 30 minutos."
+            )
+
         if (
-            self.hora_inicio is not None
-            and self.hora_fim is not None
-            and self.hora_fim <= self.hora_inicio
+            self.hora_fim > self.hora_inicio
+            and not periodo_dentro_horario_profissional(
+                self.hora_inicio,
+                self.hora_fim,
+            )
         ):
-            raise ValidationError({
-                "hora_fim": "O horário final deve ser posterior ao inicial."
-            })
+            erros["hora_fim"] = (
+                "A disponibilidade deve ficar entre 07:00 e 12:00 "
+                "ou entre 13:00 e 20:00."
+            )
+
+        if erros:
+            raise ValidationError(erros)

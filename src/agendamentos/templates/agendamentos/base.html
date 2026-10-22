@@ -1,0 +1,39 @@
+{% load static %}
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Agendamentos{% endblock %} | Playmakerz</title>
+    <link rel="stylesheet" href="{% static 'agendamentos/style.css' %}?v=20261021-1">
+</head>
+<body>
+    <header class="topbar">
+        <div class="container topbar-content">
+            <a class="brand" href="{% url 'agendamentos:lista' %}">
+                <span class="brand-mark">P</span>
+                <span>Playmakerz</span>
+            </a>
+            <nav>
+                <a href="{% url 'agendamentos:lista' %}">Agenda</a>
+                <a class="button button-small" href="{% url 'agendamentos:novo' %}">Novo agendamento</a>
+                <a href="{% url 'admin:index' %}">Admin</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container page">
+        <div class="environment-note">Interface interna para conferência e testes</div>
+
+        {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                    <div class="message message-{{ message.tags }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </main>
+</body>
+</html>

@@ -4,6 +4,10 @@ from django.utils import timezone
 
 
 class Agendamento(models.Model):
+    class Modalidade(models.TextChoices):
+        INDIVIDUAL = "individual", "Individual"
+        GRUPO = "grupo", "Em grupo"
+
     class Situacao(models.TextChoices):
         AGENDADO = "agendado", "Agendado"
         CANCELADO = "cancelado", "Cancelado"
@@ -19,6 +23,12 @@ class Agendamento(models.Model):
         on_delete=models.PROTECT,
         related_name="agendamentos",
     )
+    modalidade = models.CharField(
+        max_length=12,
+        choices=Modalidade.choices,
+        default=Modalidade.INDIVIDUAL,
+    )
+    limite_participantes = models.PositiveIntegerField(default=1)
     atletas = models.ManyToManyField(
         "usuarios.Atleta",
         related_name="agendamentos",
@@ -50,6 +60,21 @@ class Agendamento(models.Model):
 
     class Meta:
         ordering = ("inicio", "id")
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(
+                        modalidade="individual",
+                        limite_participantes=1,
+                    )
+                    | models.Q(
+                        modalidade="grupo",
+                        limite_participantes__gte=2,
+                    )
+                ),
+                name="agendamento_modalidade_limite_valido",
+            ),
+        ]
         indexes = [
             models.Index(fields=("inicio", "fim")),
             models.Index(fields=("profissional", "inicio", "fim")),
@@ -95,6 +120,30 @@ class Agendamento(models.Model):
                 "O funcionário precisa estar ativo para registrar agendamentos."
             )
 
+        if (
+            self.modalidade == self.Modalidade.INDIVIDUAL
+            and self.limite_participantes != 1
+        ):
+            erros["limite_participantes"] = (
+                "Uma atividade individual deve possuir limite de uma pessoa."
+            )
+
+        if (
+            self.modalidade == self.Modalidade.GRUPO
+            and self.limite_participantes < 2
+        ):
+            erros["limite_participantes"] = (
+                "Uma atividade em grupo deve permitir pelo menos duas pessoas."
+            )
+
+        if (
+            self.espaco_id
+            and self.limite_participantes > self.espaco.capacidade
+        ):
+            erros["limite_participantes"] = (
+                "O limite da atividade não pode superar a capacidade do espaço."
+            )
+
         if erros:
             raise ValidationError(erros)
 
@@ -106,6 +155,10 @@ class Agendamento(models.Model):
 
 
 class ParticipacaoAgendamento(models.Model):
+    class Tipo(models.TextChoices):
+        REGULAR = "regular", "Regular"
+        EXPERIMENTAL = "experimental", "Experimental"
+
     class Situacao(models.TextChoices):
         CONFIRMADA = "confirmada", "Confirmada"
         CANCELADA = "cancelada", "Cancelada"
@@ -122,6 +175,18 @@ class ParticipacaoAgendamento(models.Model):
         "usuarios.Atleta",
         on_delete=models.PROTECT,
         related_name="participacoes_agendamento",
+    )
+    registrado_por = models.ForeignKey(
+        "usuarios.Funcionario",
+        on_delete=models.PROTECT,
+        related_name="participacoes_registradas",
+        null=True,
+        blank=True,
+    )
+    tipo = models.CharField(
+        max_length=20,
+        choices=Tipo.choices,
+        default=Tipo.REGULAR,
     )
     situacao = models.CharField(
         max_length=20,
@@ -141,9 +206,18 @@ class ParticipacaoAgendamento(models.Model):
                 fields=("agendamento", "atleta"),
                 name="participacao_unica_por_agendamento_atleta",
             ),
+            models.UniqueConstraint(
+                fields=("atleta",),
+                condition=(
+                    models.Q(tipo="experimental")
+                    & ~models.Q(situacao="cancelada")
+                ),
+                name="uma_experimental_ativa_por_atleta",
+            ),
         ]
         indexes = [
             models.Index(fields=("atleta", "situacao")),
+            models.Index(fields=("atleta", "tipo", "situacao")),
         ]
 
     def __str__(self):

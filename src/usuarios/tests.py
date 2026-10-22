@@ -211,6 +211,35 @@ class AtletaTests(TestCase):
             contexto.exception.message_dict
         )
 
+    def test_email_invalido(self):
+        atleta = self.criar_atleta()
+        atleta.email = "email-invalido"
+
+        with self.assertRaises(ValidationError) as contexto:
+            atleta.full_clean()
+
+        self.assertIn("email", contexto.exception.message_dict)
+
+    def test_experimental_exige_email_e_telefone(self):
+        atleta = self.criar_atleta(date(2000, 1, 1))
+        atleta.save()
+
+        with self.assertRaises(ValidationError) as contexto:
+            atleta.validar_para_aula_experimental()
+
+        self.assertIn("email", contexto.exception.message_dict)
+        self.assertIn("telefone", contexto.exception.message_dict)
+
+    def test_experimental_aceita_atleta_sem_login_com_contato(self):
+        atleta = self.criar_atleta(date(2000, 1, 1))
+        atleta.email = "interessado@example.com"
+        atleta.telefone = "(11) 99999-8888"
+        atleta.save()
+
+        atleta.validar_para_aula_experimental()
+
+        self.assertIsNone(atleta.usuario)
+
     def test_idade_no_dia_do_aniversario_de_18(self):
         atleta = self.criar_atleta(date(2008, 10, 20))
 
@@ -469,6 +498,55 @@ class DisponibilidadeProfissionalTests(TestCase):
             DisponibilidadeProfissional.objects.count(),
             1
         )
+
+    def test_disponibilidade_da_tarde_valida(self):
+        disponibilidade = DisponibilidadeProfissional(
+            profissional=self.profissional,
+            dia_semana=0,
+            hora_inicio=time(13, 0),
+            hora_fim=time(20, 0),
+        )
+
+        disponibilidade.full_clean()
+
+    def test_rejeita_disponibilidade_fora_do_horario_de_atendimento(self):
+        disponibilidade = DisponibilidadeProfissional(
+            profissional=self.profissional,
+            dia_semana=0,
+            hora_inicio=time(6, 30),
+            hora_fim=time(7, 30),
+        )
+
+        with self.assertRaises(ValidationError) as contexto:
+            disponibilidade.full_clean()
+
+        self.assertIn("hora_fim", contexto.exception.message_dict)
+
+    def test_rejeita_disponibilidade_durante_intervalo_de_almoco(self):
+        disponibilidade = DisponibilidadeProfissional(
+            profissional=self.profissional,
+            dia_semana=0,
+            hora_inicio=time(11, 30),
+            hora_fim=time(13, 30),
+        )
+
+        with self.assertRaises(ValidationError) as contexto:
+            disponibilidade.full_clean()
+
+        self.assertIn("hora_fim", contexto.exception.message_dict)
+
+    def test_rejeita_horario_fora_da_grade_de_trinta_minutos(self):
+        disponibilidade = DisponibilidadeProfissional(
+            profissional=self.profissional,
+            dia_semana=0,
+            hora_inicio=time(9, 15),
+            hora_fim=time(10, 0),
+        )
+
+        with self.assertRaises(ValidationError) as contexto:
+            disponibilidade.full_clean()
+
+        self.assertIn("hora_inicio", contexto.exception.message_dict)
 
     def test_hora_fim_anterior_ao_inicio(self):
         disponibilidade = DisponibilidadeProfissional(

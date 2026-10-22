@@ -1,0 +1,188 @@
+{% extends "agendamentos/base.html" %}
+{% load static %}
+
+{% block title %}Novo agendamento{% endblock %}
+
+{% block content %}
+<section class="page-heading compact">
+    <div>
+        <p class="eyebrow">Cadastro</p>
+        <h1>Novo agendamento</h1>
+        <p>Escolha o profissional e um dos blocos de 30 minutos.</p>
+    </div>
+</section>
+
+<form method="post" class="card form-card" id="agendamento-form" novalidate>
+    {% csrf_token %}
+    {{ form.inicio }}
+    {{ form.fim }}
+    {{ form.agendamento_grupo }}
+    {{ form.novo_atleta }}
+    {{ form.aula_experimental }}
+
+    {% if form.non_field_errors %}
+        <div class="form-errors">{{ form.non_field_errors }}</div>
+    {% endif %}
+
+    <section class="form-section">
+        <div class="section-heading">
+            <span>1</span>
+            <div>
+                <h2>Escolha o horário</h2>
+                <p>
+                    Atendimentos das 07:00 às 12:00 e das 13:00 às 20:00.
+                    Horários ocupados aparecem desabilitados.
+                </p>
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div class="field">
+                <label for="{{ form.profissional.id_for_label }}">{{ form.profissional.label }}<span class="required">*</span></label>
+                {{ form.profissional }}
+                {% for error in form.profissional.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="field">
+                <label for="{{ form.data.id_for_label }}">{{ form.data.label }}<span class="required">*</span></label>
+                {{ form.data }}
+                {% for error in form.data.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+            </div>
+        </div>
+
+        <div class="schedule-picker" id="schedule-picker" data-url="{% url 'agendamentos:horarios' %}">
+            <div class="schedule-message" id="schedule-message">
+                Selecione um profissional e uma data para consultar os horários.
+            </div>
+            <div class="schedule-grid" id="schedule-grid"></div>
+        </div>
+        <div class="schedule-legend">
+            <span><i class="legend-free"></i> Disponível</span>
+            <span><i class="legend-group"></i> Grupo com vagas</span>
+            <span><i class="legend-busy"></i> Ocupado ou lotado</span>
+        </div>
+        {% for error in form.inicio.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+        {% for error in form.fim.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+        {% for error in form.agendamento_grupo.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+    </section>
+
+    <section class="form-section">
+        <div class="section-heading">
+            <span>2</span>
+            <div>
+                <h2>Selecione o atleta</h2>
+                <p>Em uma turma já existente, selecione somente quem entrará nela.</p>
+            </div>
+        </div>
+        <button
+            type="button"
+            class="experimental-button{% if form.novo_atleta.value %} is-active{% endif %}"
+            id="experimental-mode-button"
+            aria-pressed="{% if form.novo_atleta.value %}true{% else %}false{% endif %}"
+        >Aula Experimental</button>
+        <p class="experimental-help">
+            Cadastro rápido para interessados maiores de 18 anos, sem usuário ou senha.
+        </p>
+
+        <div id="existing-athlete-fields"{% if form.novo_atleta.value %} class="is-hidden"{% endif %}>
+            <div class="field field-wide">
+                <label>{{ form.atletas.label }}<span class="required">*</span></label>
+                {{ form.atletas }}
+                {% if form.atletas.help_text %}<small>{{ form.atletas.help_text }}</small>{% endif %}
+                {% for error in form.atletas.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+            </div>
+        </div>
+
+        <div id="quick-athlete-fields" class="quick-registration{% if not form.novo_atleta.value %} is-hidden{% endif %}">
+            <div class="quick-registration-heading">
+                <strong>Dados do interessado</strong>
+                <span>Todos os campos são obrigatórios.</span>
+            </div>
+            <div class="form-grid">
+                <div class="field field-wide">
+                    <label for="{{ form.novo_atleta_nome.id_for_label }}">{{ form.novo_atleta_nome.label }}<span class="required">*</span></label>
+                    {{ form.novo_atleta_nome }}
+                    {% for error in form.novo_atleta_nome.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="field">
+                    <label for="{{ form.novo_atleta_email.id_for_label }}">{{ form.novo_atleta_email.label }}<span class="required">*</span></label>
+                    {{ form.novo_atleta_email }}
+                    {% for error in form.novo_atleta_email.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="field">
+                    <label for="{{ form.novo_atleta_telefone.id_for_label }}">{{ form.novo_atleta_telefone.label }}<span class="required">*</span></label>
+                    {{ form.novo_atleta_telefone }}
+                    {% for error in form.novo_atleta_telefone.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="field">
+                    <label for="{{ form.novo_atleta_data_de_nascimento.id_for_label }}">{{ form.novo_atleta_data_de_nascimento.label }}<span class="required">*</span></label>
+                    {{ form.novo_atleta_data_de_nascimento }}
+                    {% for error in form.novo_atleta_data_de_nascimento.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="form-grid registration-owner">
+            <div class="field">
+                <label for="{{ form.registrado_por.id_for_label }}">{{ form.registrado_por.label }}<span class="required">*</span></label>
+                {{ form.registrado_por }}
+                <small>Para experimental, selecione um recepcionista.</small>
+                {% for error in form.registrado_por.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+            </div>
+        </div>
+        {% for error in form.novo_atleta.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+    </section>
+
+    <div class="group-join-note is-hidden" id="group-join-note">
+        <strong>Entrada em atividade existente</strong>
+        <span>O aluno será incluído nessa turma sem criar outro agendamento.</span>
+    </div>
+
+    <section class="form-section" id="new-activity-fields">
+        <div class="section-heading">
+            <span>3</span>
+            <div>
+                <h2>Configure a atividade</h2>
+                <p>Para grupos, o profissional define o limite de participantes.</p>
+            </div>
+        </div>
+
+        <div class="form-grid">
+            <div class="field">
+                <label for="{{ form.modalidade.id_for_label }}">{{ form.modalidade.label }}<span class="required">*</span></label>
+                {{ form.modalidade }}
+                {% for error in form.modalidade.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="field" id="limit-field">
+                <label for="{{ form.limite_participantes.id_for_label }}">{{ form.limite_participantes.label }}<span class="required">*</span></label>
+                {{ form.limite_participantes }}
+                <small>{{ form.limite_participantes.help_text }}</small>
+                {% for error in form.limite_participantes.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="field">
+                <label for="{{ form.espaco.id_for_label }}">{{ form.espaco.label }}<span class="required">*</span></label>
+                {{ form.espaco }}
+                <small>A soma dos limites das atividades não pode superar a capacidade.</small>
+                {% for error in form.espaco.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="field field-wide">
+                <label>{{ form.equipamentos.label }}</label>
+                {{ form.equipamentos }}
+                <small>{{ form.equipamentos.help_text }}</small>
+                {% for error in form.equipamentos.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+            </div>
+            <div class="field field-wide">
+                <label for="{{ form.observacoes.id_for_label }}">{{ form.observacoes.label }}</label>
+                {{ form.observacoes }}
+                {% for error in form.observacoes.errors %}<div class="field-error">{{ error }}</div>{% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <div class="form-actions">
+        <a class="button button-secondary" href="{% url 'agendamentos:lista' %}">Cancelar</a>
+        <button class="button" id="submit-button" type="submit">Criar agendamento</button>
+    </div>
+</form>
+
+<script src="{% static 'agendamentos/agendamento.js' %}?v=20261021-1" defer></script>
+{% endblock %}

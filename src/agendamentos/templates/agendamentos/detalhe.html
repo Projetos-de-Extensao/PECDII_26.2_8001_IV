@@ -1,0 +1,86 @@
+{% extends "agendamentos/base.html" %}
+
+{% block title %}Agendamento {{ agendamento.id }}{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <div>
+        <p class="eyebrow">Agendamento #{{ agendamento.id }}</p>
+        <h1>{{ agendamento.inicio|date:"d/m/Y" }} às {{ agendamento.inicio|date:"H:i" }}</h1>
+        <p>{{ agendamento.profissional }} · {{ agendamento.espaco }}</p>
+    </div>
+    <span class="status status-large status-{{ agendamento.situacao }}">{{ agendamento.get_situacao_display }}</span>
+</section>
+
+<div class="details-grid">
+    <section class="card">
+        <h2>Informações</h2>
+        <dl class="detail-list">
+            <div><dt>Início</dt><dd>{{ agendamento.inicio|date:"d/m/Y H:i" }}</dd></div>
+            <div><dt>Fim</dt><dd>{{ agendamento.fim|date:"d/m/Y H:i" }}</dd></div>
+            <div><dt>Profissional</dt><dd>{{ agendamento.profissional }}</dd></div>
+            <div><dt>Espaço</dt><dd>{{ agendamento.espaco }}</dd></div>
+            <div>
+                <dt>Modalidade</dt>
+                <dd>
+                    {{ agendamento.get_modalidade_display }}
+                    {% if agendamento.modalidade == "grupo" %}
+                        · {{ agendamento.inscritos_ativos }}:{{ agendamento.limite_participantes }} inscritos
+                    {% endif %}
+                </dd>
+            </div>
+            <div><dt>Registrado por</dt><dd>{{ agendamento.registrado_por }}</dd></div>
+            <div>
+                <dt>Equipamentos</dt>
+                <dd>
+                    {% for equipamento in agendamento.equipamentos.all %}
+                        {{ equipamento }}{% if not forloop.last %}, {% endif %}
+                    {% empty %}Nenhum{% endfor %}
+                </dd>
+            </div>
+            {% if agendamento.observacoes %}<div><dt>Observações</dt><dd>{{ agendamento.observacoes }}</dd></div>{% endif %}
+            {% if agendamento.motivo_cancelamento %}<div><dt>Motivo do cancelamento</dt><dd>{{ agendamento.motivo_cancelamento }}</dd></div>{% endif %}
+        </dl>
+    </section>
+
+    <section class="card">
+        <h2>Participantes</h2>
+        <div class="participant-list">
+            {% for participacao in agendamento.participacoes.all %}
+                <article class="participant">
+                    <div>
+                        <strong>{{ participacao.atleta.nome }}</strong>
+                        {% if participacao.tipo == "experimental" %}
+                            <span class="status status-experimental">Experimental</span>
+                        {% endif %}
+                        <span class="status status-{{ participacao.situacao }}">{{ participacao.get_situacao_display }}</span>
+                        {% if participacao.registrado_por %}<small>Registrado por: {{ participacao.registrado_por }}</small>{% endif %}
+                        {% if participacao.motivo_cancelamento %}<small>Motivo: {{ participacao.motivo_cancelamento }}</small>{% endif %}
+                    </div>
+                    {% if agendamento.situacao == "agendado" and participacao.situacao == "confirmada" %}
+                        <form method="post" action="{% url 'agendamentos:cancelar_participacao' participacao.id %}" class="inline-cancel-form">
+                            {% csrf_token %}
+                            {{ cancelamento_form.motivo }}
+                            <button class="button button-danger button-small" type="submit">Cancelar atleta</button>
+                        </form>
+                    {% endif %}
+                </article>
+            {% endfor %}
+        </div>
+    </section>
+</div>
+
+{% if agendamento.situacao == "agendado" %}
+    <section class="card danger-zone">
+        <div>
+            <h2>Cancelar atendimento inteiro</h2>
+            <p>Todos os participantes confirmados também serão cancelados.</p>
+        </div>
+        <form method="post" action="{% url 'agendamentos:cancelar' agendamento.id %}" class="inline-cancel-form">
+            {% csrf_token %}
+            {{ cancelamento_form.motivo }}
+            <button class="button button-danger" type="submit">Cancelar agendamento</button>
+        </form>
+    </section>
+{% endif %}
+{% endblock %}
