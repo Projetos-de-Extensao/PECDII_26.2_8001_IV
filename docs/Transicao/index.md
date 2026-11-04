@@ -1,14 +1,14 @@
 # Guia de integração front-end — Agendamentos Playmakerz
 
 **Data:** 20/10/2026  
-**Status:** núcleo do backend implementado; API e interface ainda pendentes  
+**Status:** núcleo e interface interna implementados; API REST ainda pendente
 **Público:** equipes de front-end, backend e QA
 
 ## 1. Objetivo
 
 Este documento explica como a interface de agendamentos deverá conversar com o backend do Playmakerz, quais regras já existem e o que ainda precisa ser construído antes da integração.
 
-> Importante: o navegador ainda não consegue criar agendamentos diretamente. O modelo e o serviço de domínio estão implementados e testados, mas ainda não existe um endpoint HTTP para o front-end chamar.
+> Importante: existe uma interface interna de conferência em `/agendamentos/`, protegida pelo login de funcionário do Django Admin. A API REST destinada ao front-end definitivo ainda não foi implementada.
 
 ## 2. Situação atual
 
@@ -16,16 +16,20 @@ Este documento explica como a interface de agendamentos deverá conversar com o 
 |---|---|
 | Modelo de agendamento | Implementado |
 | Agendamento individual | Implementado no serviço de backend |
-| Agendamento em grupo | Implementado no serviço de backend |
+| Agendamento em grupo e limite de participantes | Implementados no serviço de backend |
+| Participação individual de cada atleta | Modelada; fluxos de presença e falta ainda pendentes |
+| Aula experimental individual ou em grupo | Implementada no serviço e na interface interna |
+| Cadastro rápido de interessado | Implementado na tela interna de agendamento |
 | Verificação de disponibilidade do profissional | Implementada |
-| Conflitos de profissional, atleta, espaço e equipamento | Implementados |
-| Capacidade do espaço | Implementada |
+| Conflitos de profissional, atleta e equipamento | Implementados |
+| Capacidade compartilhada do espaço | Implementada pela soma dos limites reservados |
 | Validação de menor com responsável | Implementada |
 | Estados `agendado`, `cancelado` e `realizado` | Modelados |
 | API REST de agendamentos | Não implementada |
-| Tela de agendamento | Não implementada |
-| Consulta de agenda | Não implementada |
+| Tela interna de agendamento | Implementada em `/agendamentos/` |
+| Consulta de blocos de 30 minutos | Implementada na interface interna |
 | Remarcação | Não implementada |
+| Cancelamento individual e total | Implementado no serviço de backend |
 | Cancelamento por endpoint próprio | Não implementado |
 | Planos, créditos e estornos | Fora do escopo atual |
 | Recorrência e notificações | Não implementadas |
@@ -55,6 +59,8 @@ Um agendamento contém:
 | `id` | inteiro | Gerado | Identificador do agendamento |
 | `profissional` | relação | Sim | Profissional responsável |
 | `espaco` | relação | Sim | Local do atendimento |
+| `modalidade` | enum | Sim | `individual` ou `grupo` |
+| `limite_participantes` | inteiro | Sim | `1` no individual; definido pelo profissional no grupo |
 | `atletas` | lista | Sim | Pelo menos um atleta |
 | `equipamentos` | lista | Não | Pode ser vazia |
 | `registrado_por` | relação | Sim | Funcionário autenticado que criou o registro |
@@ -65,7 +71,11 @@ Um agendamento contém:
 | `criado_em` | data e hora | Gerado | Auditoria |
 | `atualizado_em` | data e hora | Gerado | Auditoria |
 
-Um agendamento com um atleta é individual. Com mais de um atleta, é em grupo. Não é necessário enviar um campo separado para indicar o tipo.
+Individual e grupo são modalidades explícitas. Uma atividade individual possui limite `1`. Uma atividade em grupo possui limite mínimo `2`, definido pelo profissional, e pode começar com apenas um participante inscrito.
+
+Cada atleta selecionado gera uma `ParticipacaoAgendamento`. Ela permite que um atendimento em grupo registre separadamente a situação de cada participante: `confirmada`, `cancelada`, `presente`, `falta` ou `falta_justificada`. O campo `tipo` identifica a participação como `regular` ou `experimental`, e `registrado_por` preserva qual funcionário fez a inscrição. A estrutura já existe, mas os endpoints para alterar presença e falta ainda não foram implementados.
+
+O cadastro de `Atleta` possui e-mail próprio e pode continuar sem uma conta de acesso. O e-mail é opcional para o cadastro geral, mas obrigatório para uma aula experimental.
 
 ## 5. Regras implementadas
 
@@ -73,6 +83,9 @@ Um agendamento com um atleta é individual. Com mais de um atleta, é em grupo. 
 
 - O fim deve ser posterior ao início.
 - Início e fim devem estar no mesmo dia, considerando o fuso configurado no backend.
+- Os horários são organizados em blocos de 30 minutos.
+- Os blocos permitidos vão de `07:00` a `12:00` e de `13:00` a `20:00`.
+- O período entre `12:00` e `13:00` não aceita agendamentos.
 - As datas precisam conter informação de fuso horário.
 - O projeto atualmente usa `USE_TZ = True` e armazena os horários em UTC.
 
@@ -95,24 +108,55 @@ Não enviar apenas `2026-10-26T14:00:00`, pois esse valor não informa o fuso.
 - Atleta menor de 18 anos precisa ter `Atleta.responsavel` preenchido.
 - A relação com o responsável é direta: cada atleta possui no máximo um responsável; um responsável pode estar ligado a vários atletas.
 - Não existem papéis de responsável principal ou secundário.
+- O mesmo atleta não pode aparecer duas vezes no mesmo agendamento.
+- Um aluno pode entrar em uma atividade em grupo existente enquanto houver vaga.
+- A quantidade exibida usa o formato `PR:LM`, em que `PR` são participantes ativos e `LM` é o limite da atividade.
+- Uma participação individual cancelada deixa de bloquear o atleta, sem necessariamente cancelar a aula dos demais participantes.
 
-### 5.3 Profissional
+#### 5.2.1 Aula experimental
+
+- Somente um recepcionista ativo pode registrar uma aula experimental.
+- A experimental pode ser individual ou uma inscrição em atividade em grupo.
+- Nome, e-mail, telefone e data de nascimento são obrigatórios.
+- O cadastro rápido é destinado a maiores de 18 anos.
+- Para menores, o recepcionista deve fazer antes o cadastro completo do atleta e do responsável.
+- Cada atleta pode possuir apenas uma experimental não cancelada em todo o histórico.
+- `presente`, `falta` e `falta_justificada` consomem o direito à experimental.
+- Uma participação cancelada permite que o recepcionista marque outra experimental.
+- A experimental ocupa horário, vaga e capacidade normalmente.
+- A tela interna permite cadastrar o interessado sem criar usuário ou senha.
+- O cadastro rápido e o agendamento são atômicos: se o agendamento falhar, o novo atleta também não é salvo.
+- Nenhum e-mail é enviado nesta etapa; o endereço é apenas armazenado.
+
+### 5.3 Cancelamento
+
+- Em um atendimento individual, cancelar a única participação cancela também o agendamento e libera todos os recursos.
+- Em um atendimento em grupo, cancelar um atleta mantém a aula enquanto existir outro participante não cancelado.
+- Quando o último participante cancela, o agendamento inteiro é cancelado.
+- Cancelar o agendamento inteiro cancela todas as participações ainda confirmadas.
+- O registro não é apagado: data e motivo do cancelamento são preservados.
+- Agendamentos realizados não podem ser cancelados.
+
+### 5.4 Profissional
 
 - Deve estar ativo.
 - O atendimento precisa estar inteiramente dentro de um período de disponibilidade cadastrado para o profissional.
+- A disponibilidade deve ser cadastrada separadamente para manhã (`07:00`–`12:00`) e tarde/noite (`13:00`–`20:00`), sempre em intervalos de 30 minutos.
 - O profissional não pode participar de dois agendamentos sobrepostos.
 
-### 5.4 Espaço
+### 5.5 Espaço
 
-- O número de atletas não pode exceder a capacidade do espaço.
-- O espaço não pode participar de dois agendamentos sobrepostos.
+- Atividades simultâneas podem compartilhar o mesmo espaço.
+- Cada atividade reserva seu `limite_participantes`, e não apenas a quantidade atual de inscritos.
+- A soma dos limites das atividades sobrepostas não pode superar a capacidade do espaço.
+- Reservar os limites impede que duas turmas sejam criadas com vagas que, quando preenchidas, ultrapassariam a capacidade do local.
 
-### 5.5 Equipamentos
+### 5.6 Equipamentos
 
 - São opcionais.
 - Um equipamento selecionado não pode participar de dois agendamentos sobrepostos.
 
-### 5.6 Conflito de horário
+### 5.7 Conflito de horário
 
 Existe conflito quando:
 
@@ -147,10 +191,13 @@ criar_agendamento(
     fim=fim,
     equipamentos=equipamentos,
     observacoes=observacoes,
+    modalidade="grupo",
+    limite_participantes=6,
+    atletas_experimentais=[atleta_experimental],
 )
 ```
 
-Ela executa as validações e salva tudo em uma transação atômica. Se alguma regra falhar, nenhum registro parcial deve permanecer no banco.
+Ela executa as validações, cria uma participação para cada atleta e salva tudo em uma transação atômica. Se alguma regra falhar, nenhum registro parcial deve permanecer no banco.
 
 A futura API deve obrigatoriamente chamar esse serviço. Não deve usar diretamente:
 
@@ -159,6 +206,19 @@ Agendamento.objects.create(...)
 ```
 
 Esse acesso direto não executaria todas as verificações que envolvem atletas e equipamentos.
+
+Para entrar em uma turma existente, o backend possui:
+
+```python
+inscrever_em_atividade_grupo(
+    agendamento=agendamento,
+    atleta=atleta,
+    experimental=True,
+    registrado_por=recepcionista,
+)
+```
+
+O serviço impede inscrição duplicada, conflito do atleta e entrada depois que o limite foi atingido.
 
 ## 7. Contrato recomendado para a API
 
@@ -177,6 +237,8 @@ Payload recomendado:
 {
   "profissional_id": 12,
   "espaco_id": 3,
+  "modalidade": "individual",
+  "limite_participantes": 1,
   "atleta_ids": [25],
   "equipamento_ids": [4, 8],
   "inicio": "2026-10-26T14:00:00-03:00",
@@ -185,13 +247,17 @@ Payload recomendado:
 }
 ```
 
-Para um grupo, basta enviar mais IDs:
+Para criar um grupo, informe a modalidade e o limite definido pelo profissional:
 
 ```json
 {
-  "atleta_ids": [25, 31, 47]
+  "modalidade": "grupo",
+  "limite_participantes": 6,
+  "atleta_ids": [25]
 }
 ```
+
+Uma inscrição posterior deve usar um endpoint próprio para entrar no agendamento existente, sem criar outro agendamento para o mesmo professor e horário.
 
 O front-end não deve enviar `registrado_por_id`. O backend deve obtê-lo da sessão ou token do funcionário autenticado. Isso impede que alguém atribua a operação a outro funcionário.
 
@@ -240,7 +306,7 @@ Resposta sugerida (`400 Bad Request`):
       "O profissional já possui um agendamento nesse horário."
     ],
     "espaco": [
-      "O espaço já possui um agendamento nesse horário."
+      "O espaço escolhido está lotado nesse horário. Capacidade: 8; vagas já reservadas: 6; novo limite: 4."
     ]
   }
 }
@@ -268,6 +334,7 @@ O front-end também precisará de endpoints semelhantes a:
 GET /api/atletas/?ativo=true&search=ana
 GET /api/profissionais/?ativo=true&search=vinicius
 GET /api/profissionais/12/disponibilidades/
+GET /api/profissionais/12/horarios/?data=2026-10-26
 GET /api/espacos/
 GET /api/equipamentos/
 GET /api/agendamentos/?inicio=2026-10-26T00:00:00-03:00&fim=2026-10-27T00:00:00-03:00
@@ -285,41 +352,39 @@ POST /api/agendamentos/91/cancelar/
 POST /api/agendamentos/91/remarcar/
 ```
 
-Cancelamento e remarcação precisam de serviços próprios no backend. O front-end não deve alterar `situacao`, `inicio` ou `fim` diretamente até essas regras serem implementadas.
+Os serviços de cancelamento já existem no backend, mas ainda precisam ser expostos por um endpoint autenticado. A remarcação ainda precisa de um serviço próprio. O front-end não deve alterar `situacao`, `inicio` ou `fim` diretamente.
 
 ## 8. Fluxo recomendado da tela
 
-### Passo 1 — selecionar atleta(s)
+### Passo 1 — selecionar profissional e data
 
-- Permitir busca por nome.
-- Permitir um ou vários atletas.
-- Exibir claramente quando o atendimento se tornar em grupo.
-- Não permitir envio com lista vazia.
+- Mostrar blocos de 30 minutos derivados da disponibilidade profissional.
+- Mostrar somente blocos entre `07:00` e `12:00` e entre `13:00` e `20:00`; não exibir blocos no intervalo de almoço.
+- Horário individual ocupado deve ficar desabilitado.
+- Grupo com vaga deve continuar selecionável e mostrar `PR:LM`, por exemplo `3:6`.
+- Grupo lotado deve ficar desabilitado e mostrar, por exemplo, `6:6`.
 
-### Passo 2 — selecionar profissional
+### Passo 2 — selecionar atleta
 
-- Mostrar apenas profissionais ativos.
-- Se possível, apresentar especialidade e disponibilidade.
+- Ao selecionar um grupo existente, incluir o atleta naquele agendamento.
+- Em um horário livre, continuar para a criação de uma nova atividade.
 
-### Passo 3 — selecionar data e período
+### Passo 3 — configurar uma nova atividade
 
-- Escolher data, hora inicial e hora final ou duração.
+- Escolher `individual` ou `grupo`.
+- No grupo, solicitar o limite definido pelo profissional.
+- Escolher espaço e equipamentos.
+- Alertar quando os limites já reservados deixarem o espaço sem capacidade.
 - Converter o horário local para ISO 8601 com deslocamento antes do envio.
 - Não desabilitar horários apenas com lógica local como garantia definitiva; outro usuário pode reservar o horário antes da confirmação.
 
-### Passo 4 — selecionar espaço e equipamentos
-
-- Mostrar a capacidade do espaço.
-- Alertar visualmente quando a quantidade de atletas ultrapassar a capacidade, mesmo sabendo que o backend repetirá a validação.
-- Equipamentos são opcionais.
-
-### Passo 5 — revisar e confirmar
+### Passo 4 — revisar e confirmar
 
 - Mostrar atleta(s), profissional, data, período, espaço e equipamentos.
 - Desabilitar o botão enquanto a requisição estiver em andamento para reduzir envios duplicados.
 - Considerar a operação concluída apenas depois de receber `201 Created`.
 
-### Passo 6 — tratar o resultado
+### Passo 5 — tratar o resultado
 
 - Em sucesso, mostrar confirmação e o identificador do agendamento.
 - Em erro, manter os dados preenchidos.
@@ -346,7 +411,7 @@ Não usar somente cor para indicar erros. Mensagens devem ser legíveis por leit
 
 ### Backend — pendências antes da integração
 
-- [ ] Aplicar a migração `agendamentos.0001_initial` no ambiente apropriado.
+- [ ] Aplicar as migrações de usuários até `0003_atleta_email` e de agendamentos até `0005_participacao_experimental` no ambiente apropriado.
 - [ ] Criar serializer de entrada.
 - [ ] Criar endpoint `POST /api/agendamentos/`.
 - [ ] Obter `registrado_por` do usuário autenticado.
@@ -356,11 +421,15 @@ Não usar somente cor para indicar erros. Mensagens devem ser legíveis por leit
 - [ ] Implementar autenticação e permissões.
 - [ ] Implementar endpoints auxiliares de consulta.
 - [ ] Definir paginação e filtros da agenda.
-- [ ] Criar serviços próprios antes de expor remarcação e cancelamento.
+- [ ] Criar endpoints que chamem `cancelar_participacao()` e `cancelar_agendamento()`.
+- [ ] Criar um serviço próprio antes de expor remarcação.
 
 ### Front-end
 
 - [ ] Criar formulário/tela de agenda.
+- [ ] Reproduzir no front-end definitivo o cadastro rápido de interessado experimental.
+- [ ] Exibir os blocos de 30 minutos e os estados disponível, ocupado e lotado.
+- [ ] Mostrar a ocupação de grupos no formato `PR:LM`.
 - [ ] Consumir os endpoints de atletas, profissionais, espaços e equipamentos.
 - [ ] Enviar datas ISO 8601 com fuso.
 - [ ] Não enviar `registrado_por_id`.
@@ -374,11 +443,17 @@ Não usar somente cor para indicar erros. Mensagens devem ser legíveis por leit
 
 - [ ] Validar agendamento individual.
 - [ ] Validar agendamento em grupo dentro da capacidade.
+- [ ] Validar que cada atleta do grupo recebe uma participação própria.
 - [ ] Validar grupo acima da capacidade.
 - [ ] Validar menor com e sem responsável.
+- [ ] Validar experimental individual e em grupo.
+- [ ] Validar que uma segunda experimental é bloqueada depois de presença ou falta.
+- [ ] Validar que o cancelamento permite remarcar a experimental.
+- [ ] Validar rollback do cadastro rápido quando o agendamento falha.
 - [ ] Validar profissional inativo e fora da disponibilidade.
 - [ ] Validar conflitos de cada recurso separadamente.
 - [ ] Validar horários adjacentes.
+- [ ] Validar que o cancelamento individual libera somente o atleta correspondente.
 - [ ] Validar que cancelados não bloqueiam horários quando o cancelamento estiver disponível.
 - [ ] Validar mensagens e acessibilidade dos erros.
 
@@ -411,9 +486,10 @@ Esses itens devem ser tratados em etapas posteriores, sem alterar o contrato bá
 
 ## 13. Referências no código
 
-- `src/agendamentos/models.py`: estrutura e validações diretas do agendamento.
+- `src/agendamentos/models.py`: estruturas de agendamento e participação, além das validações diretas.
 - `src/agendamentos/services.py`: criação transacional e regras que envolvem múltiplos recursos.
 - `src/agendamentos/tests.py`: exemplos executáveis dos comportamentos esperados.
 - `src/agendamentos/migrations/0001_initial.py`: criação das tabelas e índices.
-- `src/usuarios/models.py`: `Atleta.validar_para_agendamento()` e disponibilidade profissional.
+- `src/agendamentos/migrations/0005_participacao_experimental.py`: tipo da participação, recepcionista e garantia de uma experimental.
+- `src/usuarios/models.py`: validação do atleta, dados da experimental e disponibilidade profissional.
 
