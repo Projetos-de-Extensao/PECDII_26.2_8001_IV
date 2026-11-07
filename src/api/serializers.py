@@ -1,10 +1,11 @@
+from django.core.exceptions import ValidationError as ErroDjango
 from rest_framework import serializers
 
+from agendamentos.models import Agendamento
 from app.models import Espaco
 from app.models import Equipamento
 from usuarios.models import Atleta
 
-from django.core.exceptions import ValidationError as ErroDjango
 
 class EspacoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -48,3 +49,26 @@ class AtletaSerializer(serializers.ModelSerializer):
         except ErroDjango as erro:
             raise serializers.ValidationError(erro.message_dict)
         return dados
+
+class AgendamentoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Agendamento
+        fields = [
+            "id",
+            "profissional",
+            "espaco",
+            "modalidade",
+            "limite_participantes",
+            "atletas",
+            "equipamentos",
+            "registrado_por",
+            "inicio",
+            "fim",
+            "situacao",
+            "observacoes",
+            "motivo_cancelamento",
+            "cancelado_em",
+            "criado_em",
+            "atualizado_em",
+        ]
+        read_only_fields = fields
