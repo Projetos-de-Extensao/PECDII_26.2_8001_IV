@@ -2,6 +2,7 @@ from django.core.exceptions import ValidationError as ErroDjango
 from rest_framework import serializers
 
 from agendamentos.models import Agendamento
+from agendamentos.models import ParticipacaoAgendamento
 from app.models import Espaco
 from app.models import Equipamento
 from usuarios.models import Atleta
@@ -64,6 +65,25 @@ class AgendamentoSerializer(serializers.ModelSerializer):
             "registrado_por",
             "inicio",
             "fim",
+            "situacao",
+            "observacoes",
+            "motivo_cancelamento",
+            "cancelado_em",
+            "criado_em",
+            "atualizado_em",
+        ]
+        read_only_fields = fields
+
+# Implementa relação: Atleta --(Participa do)-> Agendamento
+class ParticipacaoAgendamentoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ParticipacaoAgendamento
+        fields = [
+            "id",
+            "agendamento",
+            "atleta",
+            "registrado_por",
+            "tipo",
             "situacao",
             "observacoes",
             "motivo_cancelamento",
