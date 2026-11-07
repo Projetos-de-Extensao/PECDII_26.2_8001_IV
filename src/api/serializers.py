@@ -75,8 +75,8 @@ class AgendamentoSerializer(serializers.ModelSerializer):
             "atualizado_em",
         ]
         read_only_fields = fields
-
-# Implementa relação: Atleta --(Participa do)-> Agendamento
+        
+# Serializa a participação de um atleta em um agendamento
 class ParticipacaoAgendamentoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ParticipacaoAgendamento
@@ -155,4 +155,3 @@ class CancelamentoSerializer(serializers.Serializer):
         allow_blank=True,
         default="",
     )
-    
