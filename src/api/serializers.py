@@ -134,3 +134,17 @@ class CriarAgendamentoSerializer(serializers.Serializer):
         many=True,
         required=False,
     )
+
+class InscricaoAgendamentoSerializer(serializers.Serializer):
+    atleta = serializers.PrimaryKeyRelatedField(
+        queryset=Atleta.objects.all()
+    )
+    experimental = serializers.BooleanField(
+        required=False,
+        default=False,
+    )
+    registrado_por = serializers.PrimaryKeyRelatedField(
+        queryset=Funcionario.objects.all(),
+        required=False,
+        allow_null=True,
+    )
