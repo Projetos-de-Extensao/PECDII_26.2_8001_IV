@@ -33,31 +33,47 @@ class AtletaViewSet(viewsets.ModelViewSet):
     serializer_class = AtletaSerializer
 
 class AgendamentoViewSet(viewsets.ViewSet):
+    
     def create(self, request):
+        # Recebe os dados da requisição e instancia o serializer de criação.
+        # O serializer será responsável por validar e converter os dados recebidos.
         serializer_entrada = CriarAgendamentoSerializer(data=request.data)
+
+        # Verifica se os campos recebidos são válidos.
+        # Caso sejam inválidos, interrompe a execução e retorna HTTP 400.
         serializer_entrada.is_valid(raise_exception=True)
 
         try:
+            # Chama o service responsável pela criação do agendamento.
+            # O service verifica as regras de negócio e salva o agendamento.
             agendamento = criar_agendamento(
                 **serializer_entrada.validated_data
             )
+
         except ErroDjango as erro:
+            # Captura erros de validação gerados pelas regras de negócio.
+            # Se o erro possui mensagens associadas a campos, preserva essa estrutura.
             if hasattr(erro, "message_dict"):
                 dados_erro = erro.message_dict
             else:
+                # Caso contrário, organiza as mensagens em uma chave genérica.
                 dados_erro = {"erro": erro.messages}
 
+            # Retorna HTTP 400 informando por que o agendamento foi rejeitado.
             return Response(
                 dados_erro,
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        # Converte o agendamento criado em dados serializáveis para a resposta.
         serializer_saida = AgendamentoSerializer(agendamento)
 
+        # Retorna os dados do novo agendamento com HTTP 201 (Created).
         return Response(
             serializer_saida.data,
             status=status.HTTP_201_CREATED,
         )
+
     
     @action(detail=True, methods=["post"])
     def cancelar(self, request, pk=None):
