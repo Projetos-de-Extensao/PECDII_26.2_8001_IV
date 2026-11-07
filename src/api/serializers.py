@@ -6,6 +6,8 @@ from agendamentos.models import ParticipacaoAgendamento
 from app.models import Espaco
 from app.models import Equipamento
 from usuarios.models import Atleta
+from usuarios.models import Funcionario
+from usuarios.models import Profissional
 
 
 class EspacoSerializer(serializers.ModelSerializer):
@@ -92,3 +94,43 @@ class ParticipacaoAgendamentoSerializer(serializers.ModelSerializer):
             "atualizado_em",
         ]
         read_only_fields = fields
+
+class CriarAgendamentoSerializer(serializers.Serializer):
+    profissional = serializers.PrimaryKeyRelatedField(
+        queryset=Profissional.objects.all()
+    )
+    espaco = serializers.PrimaryKeyRelatedField(
+        queryset=Espaco.objects.all()
+    )
+    atletas = serializers.PrimaryKeyRelatedField(
+        queryset=Atleta.objects.all(),
+        many=True,
+        allow_empty=False,
+    )
+    equipamentos = serializers.PrimaryKeyRelatedField(
+        queryset=Equipamento.objects.all(),
+        many=True,
+        required=False,
+    )
+    registrado_por = serializers.PrimaryKeyRelatedField(
+        queryset=Funcionario.objects.all()
+    )
+    inicio = serializers.DateTimeField()
+    fim = serializers.DateTimeField()
+    modalidade = serializers.ChoiceField(
+        choices=Agendamento.Modalidade.choices,
+        required=False,
+    )
+    limite_participantes = serializers.IntegerField(
+        min_value=1,
+        required=False,
+    )
+    observacoes = serializers.CharField(
+        required=False,
+        allow_blank=True,
+    )
+    atletas_experimentais = serializers.PrimaryKeyRelatedField(
+        queryset=Atleta.objects.all(),
+        many=True,
+        required=False,
+    )
