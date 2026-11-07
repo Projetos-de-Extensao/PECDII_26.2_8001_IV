@@ -148,3 +148,11 @@ class InscricaoAgendamentoSerializer(serializers.Serializer):
         required=False,
         allow_null=True,
     )
+
+class CancelamentoSerializer(serializers.Serializer):
+    motivo = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        default="",
+    )
+    
