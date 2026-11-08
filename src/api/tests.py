@@ -23,7 +23,7 @@ from usuarios.models import (
 # Também verificam se conflitos de horário são rejeitados com HTTP 400,
 # sem gerar registros indevidos no banco de dados.
 # Validam a integração entre Serializer, ViewSet, Service e banco de dados.
-class CriacaoAgendamentoAPITests(APITestCase):
+class AgendamentoAPITests(APITestCase):
 
     def setUp(self):
         # Executado ANTES de cada teste.
@@ -201,3 +201,119 @@ class CriacaoAgendamentoAPITests(APITestCase):
         # Confirma que o agendamento inválido não foi salvo.
         # A quantidade no banco deve continuar sendo exatamente 1.
         self.assertEqual(Agendamento.objects.count(), 1)
+
+        
+    def test_cancelar_agendamento_com_sucesso(self):
+        # Cria um agendamento válido por meio da própria API.
+        resposta_criacao = self.client.post(
+            reverse("agendamento-list"),
+            self.dados,
+            format="json",
+        )
+
+        # Confirma que o agendamento inicial foi criado.
+        self.assertEqual(
+            resposta_criacao.status_code,
+            status.HTTP_201_CREATED,
+            resposta_criacao.data,
+        )
+
+        # Recupera o ID do agendamento retornado pela API.
+        agendamento_id = resposta_criacao.data["id"]
+
+        # Solicita o cancelamento, informando seu motivo.
+        resposta = self.client.post(
+            reverse("agendamento-cancelar", args=[agendamento_id]),
+            {"motivo": "Atleta não poderá comparecer."},
+            format="json",
+        )
+
+        # Verifica se o cancelamento retornou HTTP 200.
+        self.assertEqual(
+            resposta.status_code,
+            status.HTTP_200_OK,
+            resposta.data,
+        )
+
+        # Consulta novamente os registros no banco de testes.
+        agendamento = Agendamento.objects.get(pk=agendamento_id)
+        participacao = ParticipacaoAgendamento.objects.get(
+            agendamento=agendamento
+        )
+
+        # Confirma que o agendamento foi cancelado.
+        self.assertEqual(agendamento.situacao, "cancelado")
+
+        # Confirma que o motivo foi registrado corretamente.
+        self.assertEqual(
+            agendamento.motivo_cancelamento,
+            "Atleta não poderá comparecer.",
+        )
+
+        # O cancelamento do agendamento inteiro também deve
+        # cancelar as participações que estavam confirmadas.
+        self.assertEqual(participacao.situacao, "cancelada")
+
+        # Confirma que a API devolveu o estado atualizado.
+        self.assertEqual(resposta.data["situacao"], "cancelado")
+
+
+    def test_cancelar_agendamento_inexistente(self):
+        # Tenta cancelar um agendamento com ID inexistente.
+        resposta = self.client.post(
+            reverse("agendamento-cancelar", args=[999999]),
+            {"motivo": "Cancelamento de teste"},
+            format="json",
+        )
+
+        # O endpoint deve retornar HTTP 404 (Not Found).
+        self.assertEqual(
+            resposta.status_code,
+            status.HTTP_404_NOT_FOUND,
+        )
+
+
+    def test_nao_cancelar_agendamento_realizado(self):
+        # Cria um agendamento válido pela API.
+        resposta_criacao = self.client.post(
+            reverse("agendamento-list"),
+            self.dados,
+            format="json",
+        )
+
+        self.assertEqual(
+            resposta_criacao.status_code,
+            status.HTTP_201_CREATED,
+            resposta_criacao.data,
+        )
+
+        # Simula um agendamento que já foi realizado.
+        # Alteramos o registro diretamente porque ainda não temos
+        # um endpoint para marcar um agendamento como realizado.
+        agendamento = Agendamento.objects.get(
+            pk=resposta_criacao.data["id"]
+        )
+        agendamento.situacao = "realizado"
+        agendamento.save(update_fields=["situacao"])
+
+        # Tenta cancelar um agendamento já realizado.
+        resposta = self.client.post(
+            reverse("agendamento-cancelar", args=[agendamento.id]),
+            {"motivo": "Tentativa de cancelamento"},
+            format="json",
+        )
+
+        # A regra de negócio deve impedir a operação.
+        self.assertEqual(
+            resposta.status_code,
+            status.HTTP_400_BAD_REQUEST,
+            resposta.data,
+        )
+
+        # Confirma que a resposta identifica o problema.
+        self.assertIn("situacao", resposta.data)
+
+        # Verifica que o agendamento continua realizado.
+        agendamento.refresh_from_db()
+        self.assertEqual(agendamento.situacao, "realizado")
+
