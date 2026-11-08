@@ -115,6 +115,7 @@ class AgendamentoAPITests(APITestCase):
         # Não precisa realizar login com senha neste teste.
         self.client.force_authenticate(user=conta_funcionario)
 
+
     def test_criar_agendamento_com_sucesso(self):
         # Envia uma requisição HTTP POST com os dados preparados.
         # reverse() encontra a URL pelo nome registrado no router.
@@ -158,6 +159,7 @@ class AgendamentoAPITests(APITestCase):
 
         # Confirma que a participação foi criada como "confirmada".
         self.assertEqual(participacao.situacao, "confirmada")
+
 
     def test_rejeitar_agendamento_com_conflito(self):
         # Obtém a URL de criação de agendamentos.
@@ -316,4 +318,184 @@ class AgendamentoAPITests(APITestCase):
         # Verifica que o agendamento continua realizado.
         agendamento.refresh_from_db()
         self.assertEqual(agendamento.situacao, "realizado")
+
+    
+    def _criar_atividade_grupo(self):
+        # Copia os dados válidos definidos no setUp(),
+        # evitando modificar os dados utilizados pelos outros testes.
+        dados_grupo = self.dados.copy()
+
+        # Configura a atividade como grupo, permitindo até dois atletas.
+        # O espaço criado no setUp() também possui capacidade para dois.
+        dados_grupo["modalidade"] = "grupo"
+        dados_grupo["limite_participantes"] = 2
+
+        # Cria a atividade por meio do endpoint de agendamentos.
+        resposta = self.client.post(
+            reverse("agendamento-list"),
+            dados_grupo,
+            format="json",
+        )
+
+        # Verifica se a preparação do cenário foi bem-sucedida.
+        self.assertEqual(
+            resposta.status_code,
+            status.HTTP_201_CREATED,
+            resposta.data,
+        )
+
+        # Retorna o ID da atividade criada para ser utilizado nos testes.
+        return resposta.data["id"]
+
+    
+    def test_inscrever_atleta_em_grupo_com_sucesso(self):
+        # Cria uma atividade em grupo com um atleta já inscrito.
+        agendamento_id = self._criar_atividade_grupo()
+
+        # Cadastra outro atleta para participar da atividade.
+        novo_atleta = Atleta.objects.create(
+            nome="Segundo atleta",
+            data_de_nascimento=date(2000, 1, 1),
+        )
+
+        # Solicita a inscrição do novo atleta pela API.
+        resposta = self.client.post(
+            reverse("agendamento-inscrever", args=[agendamento_id]),
+            {
+                "atleta": novo_atleta.id,
+                "experimental": False,
+                "registrado_por": self.funcionario.id,
+            },
+            format="json",
+        )
+
+        # Verifica se a API retornou HTTP 201 (Created).
+        self.assertEqual(
+            resposta.status_code,
+            status.HTTP_201_CREATED,
+            resposta.data,
+        )
+
+        # Confirma que a participação foi salva no banco.
+        participacao = ParticipacaoAgendamento.objects.get(
+            agendamento_id=agendamento_id,
+            atleta=novo_atleta,
+        )
+
+        # Verifica os dados da participação registrada.
+        self.assertEqual(participacao.situacao, "confirmada")
+        self.assertEqual(participacao.tipo, "regular")
+
+        # Confirma que a atividade agora possui dois participantes.
+        self.assertEqual(
+            ParticipacaoAgendamento.objects.filter(
+                agendamento_id=agendamento_id
+            ).count(),
+            2,
+        )
+
+        # Verifica se a resposta identifica o atleta inscrito.
+        self.assertEqual(resposta.data["atleta"], novo_atleta.id)
+
+    
+    def test_rejeitar_inscricao_duplicada(self):
+        # Cria uma atividade em grupo.
+        agendamento_id = self._criar_atividade_grupo()
+
+        # O atleta do setUp() já foi inscrito na criação da atividade.
+        # Tentamos inscrevê-lo novamente.
+        resposta = self.client.post(
+            reverse("agendamento-inscrever", args=[agendamento_id]),
+            {
+                "atleta": self.atleta.id,
+                "experimental": False,
+                "registrado_por": self.funcionario.id,
+            },
+            format="json",
+        )
+
+        # A API deve rejeitar a inscrição duplicada.
+        self.assertEqual(
+            resposta.status_code,
+            status.HTTP_400_BAD_REQUEST,
+            resposta.data,
+        )
+
+        # Verifica se o erro está associado à validação de atletas.
+        self.assertIn("atletas", resposta.data)
+
+        # Confirma que não foi criada outra participação.
+        self.assertEqual(
+            ParticipacaoAgendamento.objects.filter(
+                agendamento_id=agendamento_id
+            ).count(),
+            1,
+        )
+    
+    def test_rejeitar_inscricao_em_grupo_lotado(self):
+        # Cria uma atividade com limite de dois participantes.
+        # O primeiro atleta já está inscrito.
+        agendamento_id = self._criar_atividade_grupo()
+
+        # Cadastra um segundo e um terceiro atleta.
+        segundo_atleta = Atleta.objects.create(
+            nome="Segundo atleta",
+            data_de_nascimento=date(2000, 1, 1),
+        )
+
+        terceiro_atleta = Atleta.objects.create(
+            nome="Terceiro atleta",
+            data_de_nascimento=date(2000, 1, 1),
+        )
+
+        url = reverse(
+            "agendamento-inscrever",
+            args=[agendamento_id],
+        )
+
+        # Inscreve o segundo atleta, preenchendo a última vaga.
+        primeira_resposta = self.client.post(
+            url,
+            {"atleta": segundo_atleta.id},
+            format="json",
+        )
+
+        self.assertEqual(
+            primeira_resposta.status_code,
+            status.HTTP_201_CREATED,
+            primeira_resposta.data,
+        )
+
+        # Tenta inscrever o terceiro atleta na atividade lotada.
+        segunda_resposta = self.client.post(
+            url,
+            {"atleta": terceiro_atleta.id},
+            format="json",
+        )
+
+        # O service deve rejeitar a inscrição por falta de vagas.
+        self.assertEqual(
+            segunda_resposta.status_code,
+            status.HTTP_400_BAD_REQUEST,
+            segunda_resposta.data,
+        )
+
+        # Verifica se o erro está relacionado ao agendamento.
+        self.assertIn("agendamento", segunda_resposta.data)
+
+        # Confirma que apenas duas participações foram registradas.
+        self.assertEqual(
+            ParticipacaoAgendamento.objects.filter(
+                agendamento_id=agendamento_id
+            ).count(),
+            2,
+        )
+
+        # Confirma que o terceiro atleta não foi inscrito.
+        self.assertFalse(
+            ParticipacaoAgendamento.objects.filter(
+                agendamento_id=agendamento_id,
+                atleta=terceiro_atleta,
+            ).exists()
+        )
 
