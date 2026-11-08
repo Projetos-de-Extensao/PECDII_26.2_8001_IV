@@ -9,9 +9,11 @@ from app.models import Espaco
 from app.models import Equipamento
 from usuarios.models import Atleta
 from agendamentos.models import Agendamento
+from agendamentos.models import ParticipacaoAgendamento
 from agendamentos.services import criar_agendamento
 from agendamentos.services import cancelar_agendamento
 from agendamentos.services import inscrever_em_atividade_grupo
+from agendamentos.services import cancelar_participacao as cancelar_participacao_service
 
 from .serializers import EspacoSerializer
 from .serializers import EquipamentoSerializer
@@ -173,4 +175,60 @@ class AgendamentoViewSet(viewsets.ViewSet):
             serializer_saida.data,
             status=codigo_status,
         )
+
+    
+    @action(
+        detail=True,
+        methods=["post"],
+        # Extrai o id da participação diretamente do URL
+        url_path=r"participacoes/(?P<participacao_id>[^/.]+)/cancelar",
+        url_name="cancelar-participacao",
+    )
+    def cancelar_participacao(self, request, pk=None, participacao_id=None):
+        # Busca a participação pelo ID informado na URL.
+        # Também verifica se ela pertence ao agendamento informado.
+        # Caso contrário, retorna HTTP 404.
+        participacao = get_object_or_404(
+            ParticipacaoAgendamento,
+            pk=participacao_id,
+            agendamento_id=pk,
+        )
+
+        # Recebe e valida o motivo do cancelamento.
+        serializer_entrada = CancelamentoSerializer(
+            data=request.data
+        )
+        serializer_entrada.is_valid(raise_exception=True)
+
+        try:
+            # Chama o service responsável pelo cancelamento.
+            # O service aplica as regras de negócio e atualiza
+            # a participação e, se necessário, o agendamento.
+            agendamento = cancelar_participacao_service(
+                participacao=participacao,
+                **serializer_entrada.validated_data
+            )
+
+        except ErroDjango as erro:
+            # Captura os erros de validação gerados pelo service.
+            if hasattr(erro, "message_dict"):
+                dados_erro = erro.message_dict
+            else:
+                dados_erro = {"erro": erro.messages}
+
+            # Retorna HTTP 400 caso o cancelamento seja rejeitado.
+            return Response(
+                dados_erro,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Serializa o agendamento atualizado retornado pelo service.
+        serializer_saida = AgendamentoSerializer(agendamento)
+
+        # Retorna HTTP 200 indicando que a operação foi concluída.
+        return Response(
+            serializer_saida.data,
+            status=status.HTTP_200_OK,
+        )
+
 
