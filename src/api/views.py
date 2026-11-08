@@ -11,6 +11,7 @@ from usuarios.models import Atleta
 from agendamentos.models import Agendamento
 from agendamentos.services import criar_agendamento
 from agendamentos.services import cancelar_agendamento
+from agendamentos.services import inscrever_em_atividade_grupo
 
 from .serializers import EspacoSerializer
 from .serializers import EquipamentoSerializer
@@ -18,6 +19,8 @@ from .serializers import AtletaSerializer
 from .serializers import AgendamentoSerializer
 from .serializers import CriarAgendamentoSerializer
 from .serializers import CancelamentoSerializer
+from .serializers import InscricaoAgendamentoSerializer
+from .serializers import ParticipacaoAgendamentoSerializer
 
 
 class EspacoViewSet(viewsets.ModelViewSet):
@@ -111,3 +114,63 @@ class AgendamentoViewSet(viewsets.ViewSet):
             serializer_saida.data,
             status=status.HTTP_200_OK,
         )
+
+    
+    @action(detail=True, methods=["post"])
+    def inscrever(self, request, pk=None):
+        # Busca o agendamento pelo ID informado na URL.
+        # Caso não exista, retorna HTTP 404.
+        agendamento = get_object_or_404(Agendamento, pk=pk)
+
+        # Recebe e valida os dados da inscrição.
+        serializer_entrada = InscricaoAgendamentoSerializer(
+            data=request.data
+        )
+        serializer_entrada.is_valid(raise_exception=True)
+
+        # Verifica se já existe uma participação desse atleta.
+        # O service permite reativar uma inscrição anteriormente cancelada.
+        ja_existia = agendamento.participacoes.filter(
+            atleta=serializer_entrada.validated_data["atleta"]
+        ).exists()
+
+        try:
+            # Chama o service responsável por realizar a inscrição.
+            # O service verifica as regras de negócio e salva
+            # ou reativa a participação do atleta.
+            participacao = inscrever_em_atividade_grupo(
+                agendamento=agendamento,
+                **serializer_entrada.validated_data
+            )
+
+        except ErroDjango as erro:
+            # Captura erros das regras de negócio do service.
+            if hasattr(erro, "message_dict"):
+                dados_erro = erro.message_dict
+            else:
+                dados_erro = {"erro": erro.messages}
+
+            # Retorna HTTP 400 caso a inscrição seja rejeitada.
+            return Response(
+                dados_erro,
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        # Converte a participação em dados para a resposta HTTP.
+        serializer_saida = ParticipacaoAgendamentoSerializer(
+            participacao
+        )
+
+        # HTTP 201 para uma nova inscrição.
+        # HTTP 200 para a reativação de uma inscrição cancelada.
+        codigo_status = (
+            status.HTTP_200_OK
+            if ja_existia
+            else status.HTTP_201_CREATED
+        )
+
+        return Response(
+            serializer_saida.data,
+            status=codigo_status,
+        )
+
