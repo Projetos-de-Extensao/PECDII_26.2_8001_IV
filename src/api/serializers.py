@@ -1,10 +1,14 @@
+from django.core.exceptions import ValidationError as ErroDjango
 from rest_framework import serializers
 
+from agendamentos.models import Agendamento
+from agendamentos.models import ParticipacaoAgendamento
 from app.models import Espaco
 from app.models import Equipamento
 from usuarios.models import Atleta
+from usuarios.models import Funcionario
+from usuarios.models import Profissional
 
-from django.core.exceptions import ValidationError as ErroDjango
 
 class EspacoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -48,3 +52,106 @@ class AtletaSerializer(serializers.ModelSerializer):
         except ErroDjango as erro:
             raise serializers.ValidationError(erro.message_dict)
         return dados
+
+class AgendamentoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Agendamento
+        fields = [
+            "id",
+            "profissional",
+            "espaco",
+            "modalidade",
+            "limite_participantes",
+            "atletas",
+            "equipamentos",
+            "registrado_por",
+            "inicio",
+            "fim",
+            "situacao",
+            "observacoes",
+            "motivo_cancelamento",
+            "cancelado_em",
+            "criado_em",
+            "atualizado_em",
+        ]
+        read_only_fields = fields
+        
+# Serializa a participação de um atleta em um agendamento
+class ParticipacaoAgendamentoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ParticipacaoAgendamento
+        fields = [
+            "id",
+            "agendamento",
+            "atleta",
+            "registrado_por",
+            "tipo",
+            "situacao",
+            "observacoes",
+            "motivo_cancelamento",
+            "cancelado_em",
+            "criado_em",
+            "atualizado_em",
+        ]
+        read_only_fields = fields
+
+class CriarAgendamentoSerializer(serializers.Serializer):
+    profissional = serializers.PrimaryKeyRelatedField(
+        queryset=Profissional.objects.all()
+    )
+    espaco = serializers.PrimaryKeyRelatedField(
+        queryset=Espaco.objects.all()
+    )
+    atletas = serializers.PrimaryKeyRelatedField(
+        queryset=Atleta.objects.all(),
+        many=True,
+        allow_empty=False,
+    )
+    equipamentos = serializers.PrimaryKeyRelatedField(
+        queryset=Equipamento.objects.all(),
+        many=True,
+        required=False,
+    )
+    registrado_por = serializers.PrimaryKeyRelatedField(
+        queryset=Funcionario.objects.all()
+    )
+    inicio = serializers.DateTimeField()
+    fim = serializers.DateTimeField()
+    modalidade = serializers.ChoiceField(
+        choices=Agendamento.Modalidade.choices,
+        required=False,
+    )
+    limite_participantes = serializers.IntegerField(
+        min_value=1,
+        required=False,
+    )
+    observacoes = serializers.CharField(
+        required=False,
+        allow_blank=True,
+    )
+    atletas_experimentais = serializers.PrimaryKeyRelatedField(
+        queryset=Atleta.objects.all(),
+        many=True,
+        required=False,
+    )
+
+class InscricaoAgendamentoSerializer(serializers.Serializer):
+    atleta = serializers.PrimaryKeyRelatedField(
+        queryset=Atleta.objects.all()
+    )
+    experimental = serializers.BooleanField(
+        required=False,
+        default=False,
+    )
+    registrado_por = serializers.PrimaryKeyRelatedField(
+        queryset=Funcionario.objects.all(),
+        required=False,
+        allow_null=True,
+    )
+
+class CancelamentoSerializer(serializers.Serializer):
+    motivo = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        default="",
+    )
