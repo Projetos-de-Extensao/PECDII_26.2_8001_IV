@@ -499,3 +499,214 @@ class AgendamentoAPITests(APITestCase):
             ).exists()
         )
 
+        
+    def test_cancelar_participacao_sem_cancelar_agendamento(self):
+        # Cria uma atividade em grupo com um atleta inscrito.
+        agendamento_id = self._criar_atividade_grupo()
+
+        # Cadastra um segundo atleta.
+        segundo_atleta = Atleta.objects.create(
+            nome="Segundo atleta",
+            data_de_nascimento=date(2000, 1, 1),
+        )
+
+        # Inscreve o segundo atleta na atividade pela API.
+        resposta_inscricao = self.client.post(
+            reverse("agendamento-inscrever", args=[agendamento_id]),
+            {
+                "atleta": segundo_atleta.id,
+                "registrado_por": self.funcionario.id,
+            },
+            format="json",
+        )
+
+        # Confirma que a inscrição foi realizada.
+        self.assertEqual(
+            resposta_inscricao.status_code,
+            status.HTTP_201_CREATED,
+            resposta_inscricao.data,
+        )
+
+        # Busca a participação do segundo atleta no banco.
+        participacao = ParticipacaoAgendamento.objects.get(
+            agendamento_id=agendamento_id,
+            atleta=segundo_atleta,
+        )
+
+        # Solicita o cancelamento dessa participação pela API.
+        resposta = self.client.post(
+            reverse(
+                "agendamento-cancelar-participacao",
+                kwargs={
+                    "pk": agendamento_id,
+                    "participacao_id": participacao.id,
+                },
+            ),
+            {"motivo": "Desistência do atleta."},
+            format="json",
+        )
+
+        # Verifica se o endpoint retornou HTTP 200.
+        self.assertEqual(
+            resposta.status_code,
+            status.HTTP_200_OK,
+            resposta.data,
+        )
+
+        # Atualiza os objetos com os dados persistidos no banco.
+        participacao.refresh_from_db()
+        agendamento = Agendamento.objects.get(pk=agendamento_id)
+
+        # Confirma que a participação foi cancelada.
+        self.assertEqual(participacao.situacao, "cancelada")
+        self.assertEqual(
+            participacao.motivo_cancelamento,
+            "Desistência do atleta.",
+        )
+        self.assertIsNotNone(participacao.cancelado_em)
+
+        # O agendamento deve continuar ativo.
+        self.assertEqual(agendamento.situacao, "agendado")
+
+        # O primeiro atleta deve permanecer inscrito.
+        primeira_participacao = ParticipacaoAgendamento.objects.get(
+            agendamento_id=agendamento_id,
+            atleta=self.atleta,
+        )
+        self.assertEqual(
+            primeira_participacao.situacao,
+            "confirmada",
+        )
+
+        # Confirma que a resposta representa o agendamento ativo.
+        self.assertEqual(resposta.data["situacao"], "agendado")
+
+    
+    def test_cancelar_ultima_participacao(self):
+        # Cria uma atividade em grupo com apenas um atleta inscrito.
+        agendamento_id = self._criar_atividade_grupo()
+
+        # Recupera a única participação existente.
+        participacao = ParticipacaoAgendamento.objects.get(
+            agendamento_id=agendamento_id,
+            atleta=self.atleta,
+        )
+
+        # Solicita o cancelamento dessa participação.
+        resposta = self.client.post(
+            reverse(
+                "agendamento-cancelar-participacao",
+                kwargs={
+                    "pk": agendamento_id,
+                    "participacao_id": participacao.id,
+                },
+            ),
+            {"motivo": "Atleta desistiu da atividade."},
+            format="json",
+        )
+
+        # Confirma que a operação retornou HTTP 200.
+        self.assertEqual(
+            resposta.status_code,
+            status.HTTP_200_OK,
+            resposta.data,
+        )
+
+        # Consulta o estado atualizado no banco de testes.
+        participacao.refresh_from_db()
+        agendamento = Agendamento.objects.get(pk=agendamento_id)
+
+        # Verifica se a participação foi cancelada.
+        self.assertEqual(participacao.situacao, "cancelada")
+
+        # Como não restam participantes ativos,
+        # o próprio agendamento também deve ser cancelado.
+        self.assertEqual(agendamento.situacao, "cancelado")
+
+        # Confirma que o motivo foi registrado no agendamento.
+        self.assertEqual(
+            agendamento.motivo_cancelamento,
+            "Atleta desistiu da atividade.",
+        )
+
+        # Confirma que a resposta contém a situação atualizada.
+        self.assertEqual(resposta.data["situacao"], "cancelado")
+
+
+    
+    def test_rejeitar_cancelamento_de_participacao_presente(self):
+        # Cria uma atividade em grupo com um atleta inscrito.
+        agendamento_id = self._criar_atividade_grupo()
+
+        # Busca a participação que será utilizada no teste.
+        participacao = ParticipacaoAgendamento.objects.get(
+            agendamento_id=agendamento_id,
+            atleta=self.atleta,
+        )
+
+        # Simula uma participação com presença já registrada.
+        participacao.situacao = "presente"
+        participacao.save(update_fields=["situacao"])
+
+        # Tenta cancelar a participação pela API.
+        resposta = self.client.post(
+            reverse(
+                "agendamento-cancelar-participacao",
+                kwargs={
+                    "pk": agendamento_id,
+                    "participacao_id": participacao.id,
+                },
+            ),
+            {"motivo": "Tentativa de cancelamento."},
+            format="json",
+        )
+
+        # A regra de negócio deve rejeitar a operação.
+        self.assertEqual(
+            resposta.status_code,
+            status.HTTP_400_BAD_REQUEST,
+            resposta.data,
+        )
+
+        # Confirma que o erro está associado à situação.
+        self.assertIn("situacao", resposta.data)
+
+        # Verifica que a participação não foi alterada.
+        participacao.refresh_from_db()
+        self.assertEqual(participacao.situacao, "presente")
+
+        # Confirma que o agendamento também não foi cancelado.
+        agendamento = Agendamento.objects.get(pk=agendamento_id)
+        self.assertEqual(agendamento.situacao, "agendado")
+
+
+    
+    def test_cancelar_participacao_inexistente(self):
+        # Cria uma atividade em grupo válida.
+        agendamento_id = self._criar_atividade_grupo()
+
+        # Tenta cancelar uma participação com ID inexistente.
+        resposta = self.client.post(
+            reverse(
+                "agendamento-cancelar-participacao",
+                kwargs={
+                    "pk": agendamento_id,
+                    "participacao_id": 999999,
+                },
+            ),
+            {"motivo": "Cancelamento de teste."},
+            format="json",
+        )
+
+        # A API deve informar que a participação não foi encontrada.
+        self.assertEqual(
+            resposta.status_code,
+            status.HTTP_404_NOT_FOUND,
+        )
+
+        # Nenhuma participação existente deve ser alterada.
+        participacao = ParticipacaoAgendamento.objects.get(
+            agendamento_id=agendamento_id,
+            atleta=self.atleta,
+        )
+        self.assertEqual(participacao.situacao, "confirmada")
