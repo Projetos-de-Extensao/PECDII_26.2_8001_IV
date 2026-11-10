@@ -1,3 +1,4 @@
+
 @startsalt
 
 {+
@@ -8,9 +9,11 @@
     }
 
     {
-        <&person> Nome: | "                         "
+        <&person> Nome completo: | "                         "
+        <&person> Nome de usuário: | "                         "
         @ E-mail: | "exemplo@gmail.com        "
         <&phone> Telefone: | "(00) 00000-0000          "
+        <&calendar> Data de nascimento: | "dd/mm/aaaa          "
         <&key> Senha: | "********                 "
         <&key> Confirmar senha: | "********                 "
         Tipo de usuário: | ^Atleta^
