@@ -4,7 +4,7 @@ from django import forms
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 
-from app.models import Equipamento, Espaco
+from agendamentos.models import Equipamento, Espaco
 from usuarios.models import Atleta, Funcionario, Profissional
 
 from .models import Agendamento

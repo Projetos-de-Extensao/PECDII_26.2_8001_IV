@@ -6,7 +6,7 @@ from django.db import IntegrityError, transaction
 from django.test import TestCase
 from django.utils import timezone
 
-from app.models import Equipamento, Espaco
+from agendamentos.models import Equipamento, Espaco
 from usuarios.models import (
     Atleta,
     DisponibilidadeProfissional,
