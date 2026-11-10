@@ -23,26 +23,29 @@ title: Levantamento de Requisitos
 
 ### **2. Requisitos Funcionais**
 
-| ID   | Descrição                                                                    | Prioridade |
-| ---- | ------------------------------------------------------------------------------ | ---------- |
-| RF01 | O usuário deve conseguir entrar no sistema com e-mail e senha. | Alta |
-| RF02 | O sistema deve permitir cadastrar atletas, responsáveis, profissionais e funcionários. | Alta |
-| RF03 | O cadastro de profissionais e funcionários deve depender de autorização da administração. | Média |
-| RF04 | O atleta menor de idade deve ser associado a um pai ou responsável. | Alta |
-| RF05 | A recepção deve registrar os documentos, a autorização do responsável e a entrega dos exames médicos do atleta. | Média |
-| RF06 | O sistema deve permitir cadastrar espaços e equipamentos. | Alta |
-| RF07 | O funcionário da manutenção deve conseguir bloquear um espaço ou equipamento por um período. | Média |
-| RF08 | O usuário deve conseguir consultar os profissionais e os horários livres de cada um. | Alta |
-| RF09 | O sistema deve permitir criar agendamentos individuais ou em grupo, com atleta(s), profissional, espaço e equipamentos. | Alta |
-| RF10 | O sistema deve verificar conflitos de horário (atleta, profissional, espaço, equipamento e manutenção) antes de confirmar. | Alta |
-| RF11 | O sistema deve permitir agendamentos recorrentes. | Média |
-| RF12 | O sistema deve registrar presença, falta e cancelamento de cada agendamento. | Média |
-| RF13 | O sistema deve enviar confirmação, lembretes e avisos sobre os agendamentos. | Média |
-| RF14 | O sistema deve permitir consultar a ocupação dos espaços. | Baixa |
-| RF15 | Cada usuário deve ver só o que o seu perfil permite (atleta e responsável veem só os próprios agendamentos, profissional vê a própria agenda). | Alta |
-| RF16 | O profissional deve conseguir registrar avaliações e observações do atleta e gerar relatório por atleta e período. (proposta, precisa ser validada) | Baixa |
-| RF17 | O sistema deve permitir remarcar um agendamento, liberando os recursos antigos e avisando os envolvidos. | Média |
-| RF18 | O gestor deve conseguir consultar o registro de alterações importantes do sistema. | Média |
+| ID   | Descrição | Prioridade | Situação | Observação sobre o código |
+| ---- | --------- | ---------- | -------- | ------------------------- |
+| RF01 | O usuário deve conseguir entrar no sistema com e-mail e senha. | Alta | Parcial | Login do Django com usuário e senha, não por e-mail. |
+| RF02 | O sistema deve permitir cadastrar atletas, responsáveis, profissionais e funcionários. | Alta | Implementado | Cadastros no Django admin. Atletas também pela API e pelo cadastro rápido de interessados. |
+| RF03 | O cadastro de profissionais e funcionários deve depender de autorização da administração. | Média | Parcial | Só quem tem permissão no Django admin cadastra profissionais e funcionários. Não há fluxo de autorização. |
+| RF04 | O atleta menor de idade deve ser associado a um pai ou responsável. | Alta | Parcial | O vínculo existe. A exigência vale na hora de agendar, não no cadastro. |
+| RF05 | A recepção deve registrar os documentos, a autorização do responsável e a entrega dos exames médicos do atleta. | Média | Planejado | Sem registro de documentos, autorização ou exames. |
+| RF06 | O sistema deve permitir cadastrar espaços e equipamentos. | Alta | Implementado | API `/api/espacos/` e `/api/equipamentos/` e Django admin. |
+| RF07 | O funcionário da manutenção deve conseguir bloquear um espaço ou equipamento por um período. | Média | Planejado | Sem bloqueio por manutenção. |
+| RF08 | O usuário deve conseguir consultar os profissionais e os horários livres de cada um. | Alta | Implementado | Horários livres do profissional na tela de novo agendamento (`/agendamentos/horarios/`). |
+| RF09 | O sistema deve permitir criar agendamentos individuais ou em grupo, com atleta(s), profissional, espaço e equipamentos. | Alta | Implementado | Agendamentos individuais e em grupo, pela tela e pela API. |
+| RF10 | O sistema deve verificar conflitos de horário (atleta, profissional, espaço, equipamento e manutenção) antes de confirmar. | Alta | Parcial | Atleta, profissional, espaço e equipamento são verificados. Manutenção ainda não. |
+| RF11 | O sistema deve permitir agendamentos recorrentes. | Média | Planejado | Sem recorrência. |
+| RF12 | O sistema deve registrar presença, falta e cancelamento de cada agendamento. | Média | Parcial | Cancelamento implementado. Presença e falta existem só no modelo. |
+| RF13 | O sistema deve enviar confirmação, lembretes e avisos sobre os agendamentos. | Média | Planejado | Sem envio de mensagens. |
+| RF14 | O sistema deve permitir consultar a ocupação dos espaços. | Baixa | Planejado | Sem tela de ocupação. |
+| RF15 | Cada usuário deve ver só o que o seu perfil permite (atleta e responsável veem só os próprios agendamentos, profissional vê a própria agenda). | Alta | Planejado | Hoje a interface exige acesso de equipe e a API exige login. Não há visão por perfil. |
+| RF16 | O profissional deve conseguir registrar avaliações e observações do atleta e gerar relatório por atleta e período. (proposta, precisa ser validada) | Baixa | Planejado | Sem avaliações e relatórios. |
+| RF17 | O sistema deve permitir remarcar um agendamento, liberando os recursos antigos e avisando os envolvidos. | Média | Planejado | Sem edição de agendamento: é preciso cancelar e criar outro. |
+| RF18 | O gestor deve conseguir consultar o registro de alterações importantes do sistema. | Média | Planejado | Sem registro geral de alterações. |
+| RF19 | O sistema deve permitir agendar uma aula experimental para um interessado, uma única vez por pessoa, registrada por um recepcionista. (incluído a partir do código, precisa ser validado) | Média | Implementado | Cadastro rápido de interessado maior de 18 anos, na tela de novo agendamento. |
+
+A situação de cada requisito foi conferida com o código em 10/11/2026. **Implementado** significa que o fluxo existe e tem testes automatizados. **Parcial** significa que parte do fluxo existe. **Planejado** significa que ainda não existe. A situação de cada caso de uso está em [Casos de Uso](casos_de_uso.md).
 
 ### **3. Requisitos Não Funcionais**
 
