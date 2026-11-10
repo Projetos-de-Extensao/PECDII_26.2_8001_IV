@@ -1,3 +1,4 @@
+
 @startsalt
 
 {+
@@ -8,26 +9,19 @@
     }
 
     {
-        @ E-mail: | "exemplo@gmail.com           "
+        <&person> Usuário: | "seu_usuario                 "
         <&key> Senha: | "********                    "
     }
 
     {
         [<&account-login> Entrar]
-        [Esqueci minha senha]
     }
 
     ..
 
     {
-        Ainda não possui uma conta?
-        [<&person> Criar conta]
-    }
-
-    --
-
-    {
-        Login com: | [Google]
+        Acesso para usuários cadastrados
+        Contas gerenciadas pela administração
     }
 }
 
