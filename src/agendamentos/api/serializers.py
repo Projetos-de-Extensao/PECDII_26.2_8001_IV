@@ -3,8 +3,8 @@ from rest_framework import serializers
 
 from agendamentos.models import Agendamento
 from agendamentos.models import ParticipacaoAgendamento
-from app.models import Espaco
-from app.models import Equipamento
+from agendamentos.models import Espaco
+from agendamentos.models import Equipamento
 from usuarios.models import Atleta
 from usuarios.models import Funcionario
 from usuarios.models import Profissional

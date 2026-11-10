@@ -5,8 +5,8 @@ from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.response import Response
 
-from app.models import Espaco
-from app.models import Equipamento
+from agendamentos.models import Espaco
+from agendamentos.models import Equipamento
 from usuarios.models import Atleta
 from agendamentos.models import Agendamento
 from agendamentos.models import ParticipacaoAgendamento

@@ -2,6 +2,24 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils import timezone
 
+class Espaco(models.Model):
+    nome = models.CharField(max_length=100)
+    tipo = models.CharField(max_length=50)
+    capacidade = models.PositiveIntegerField()
+
+    def comporta(self, quantidade_atletas):
+        return 0 < quantidade_atletas <= self.capacidade
+
+    def __str__(self):
+        return f"{self.nome} - {self.tipo}"
+
+
+class Equipamento(models.Model):
+    nome = models.CharField(max_length=100)
+    tipo = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.nome} - {self.tipo}"
 
 class Agendamento(models.Model):
     class Modalidade(models.TextChoices):
@@ -19,7 +37,7 @@ class Agendamento(models.Model):
         related_name="agendamentos",
     )
     espaco = models.ForeignKey(
-        "app.Espaco",
+        "Espaco",
         on_delete=models.PROTECT,
         related_name="agendamentos",
     )
@@ -36,7 +54,7 @@ class Agendamento(models.Model):
         through_fields=("agendamento", "atleta"),
     )
     equipamentos = models.ManyToManyField(
-        "app.Equipamento",
+        "Equipamento",
         related_name="agendamentos",
         blank=True,
     )
