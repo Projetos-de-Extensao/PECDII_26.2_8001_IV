@@ -6,5 +6,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('agendamentos/', include('agendamentos.urls')),
     path('', include('app.urls')),  # URLs tradicionais
-    path('api/', include('api.urls')),  # API REST do sistema
+    path('api/', include('agendamentos.api.urls')),  # API REST do sistema
 ]

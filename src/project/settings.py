@@ -40,8 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'app',
     'usuarios',
-    'agendamentos',
-    'api'
+    'agendamentos'
 ]
 
 MIDDLEWARE = [
