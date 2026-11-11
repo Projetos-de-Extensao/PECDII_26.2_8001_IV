@@ -1,14 +1,14 @@
 # Guia de integração front-end — Agendamentos Playmakerz
 
-**Data:** 20/10/2026  
-**Status:** núcleo e interface interna implementados; API REST ainda pendente
+**Data:** 11/11/2026  
+**Status:** núcleo, interface interna e API REST implementados
 **Público:** equipes de front-end, backend e QA
 
 ## 1. Objetivo
 
 Este documento explica como a interface de agendamentos deverá conversar com o backend do Playmakerz, quais regras já existem e o que ainda precisa ser construído antes da integração.
 
-> Importante: existe uma interface interna de conferência em `/agendamentos/`, protegida pelo login de funcionário do Django Admin. A API REST destinada ao front-end definitivo ainda não foi implementada.
+> Importante: existe uma interface interna de conferência em `/agendamentos/`, protegida pelo login de funcionário do Django Admin. A API REST também já foi implementada e está documentada na página [API REST](../Construcao/api.md).  
 
 ## 2. Situação atual
 
@@ -25,12 +25,12 @@ Este documento explica como a interface de agendamentos deverá conversar com o 
 | Capacidade compartilhada do espaço | Implementada pela soma dos limites reservados |
 | Validação de menor com responsável | Implementada |
 | Estados `agendado`, `cancelado` e `realizado` | Modelados |
-| API REST de agendamentos | Não implementada |
+| API REST de agendamentos | Implementada (criar, cancelar e inscrever) |
 | Tela interna de agendamento | Implementada em `/agendamentos/` |
 | Consulta de blocos de 30 minutos | Implementada na interface interna |
 | Remarcação | Não implementada |
 | Cancelamento individual e total | Implementado no serviço de backend |
-| Cancelamento por endpoint próprio | Não implementado |
+| Cancelamento por endpoint próprio | Implementado |
 | Planos, créditos e estornos | Fora do escopo atual |
 | Recorrência e notificações | Não implementadas |
 
@@ -39,7 +39,7 @@ Este documento explica como a interface de agendamentos deverá conversar com o 
 ```text
 Interface web
     ↓ requisição HTTP
-API Django/DRF (a implementar)
+API Django/DRF
     ↓ converte IDs em objetos e identifica o usuário autenticado
 services.py — criar_agendamento()
     ↓ valida regras e conflitos em uma transação
@@ -199,7 +199,7 @@ criar_agendamento(
 
 Ela executa as validações, cria uma participação para cada atleta e salva tudo em uma transação atômica. Se alguma regra falhar, nenhum registro parcial deve permanecer no banco.
 
-A futura API deve obrigatoriamente chamar esse serviço. Não deve usar diretamente:
+A API já chama esse serviço e não deve usar diretamente:
 
 ```python
 Agendamento.objects.create(...)
@@ -222,7 +222,12 @@ O serviço impede inscrição duplicada, conflito do atleta e entrada depois que
 
 ## 7. Contrato recomendado para a API
 
-Esta seção é uma proposta de contrato. Os endpoints ainda precisam ser implementados e alinhados entre as equipes.
+Esta seção foi escrita antes da API ficar pronta. A versão final está na página [API REST](../Construcao/api.md). Os exemplos abaixo diferem da API real em quatro pontos:
+
+- os campos se chamam `profissional`, `espaco`, `atletas` e `equipamentos`, sem `_id` nem `_ids`;
+- o `registrado_por` vai no corpo da requisição; 
+- o erro 400 vem direto por campo (`{"profissional": [...]}`), sem o objeto `errors`;
+- as datas são aceitas sem fuso (`2026-11-16T14:00`) e, nesse caso, valem como UTC.
 
 ### 7.1 Criar agendamento
 
@@ -341,18 +346,18 @@ GET /api/agendamentos/?inicio=2026-10-26T00:00:00-03:00&fim=2026-10-27T00:00:00-
 GET /api/agendamentos/91/
 ```
 
-Esses endpoints ainda não existem. Os nomes e formatos finais devem ser acordados antes da implementação.
+O que já existe: atletas, profissionais (com `/horarios/`), espaços e equipamentos, mas sem os filtros `?ativo=` e `?search=`. O que não existe: `/profissionais/{id}/disponibilidades/` e `GET /api/agendamentos/` (listagem e consulta).
 
 ### 7.4 Operações futuras
 
-Não assumir que estes endpoints já existem:
+O cancelamento já existe, a remarcação não:
 
 ```http
 POST /api/agendamentos/91/cancelar/
 POST /api/agendamentos/91/remarcar/
 ```
 
-Os serviços de cancelamento já existem no backend, mas ainda precisam ser expostos por um endpoint autenticado. A remarcação ainda precisa de um serviço próprio. O front-end não deve alterar `situacao`, `inicio` ou `fim` diretamente.
+Os serviços de cancelamento já existem no backend, e já estão expostos por um endpoint autenticado. A remarcação ainda precisa de um serviço próprio. O front-end não deve alterar `situacao`, `inicio` ou `fim` diretamente.
 
 ## 8. Fluxo recomendado da tela
 
@@ -411,17 +416,18 @@ Não usar somente cor para indicar erros. Mensagens devem ser legíveis por leit
 
 ### Backend — pendências antes da integração
 
-- [ ] Aplicar as migrações de usuários até `0003_atleta_email` e de agendamentos até `0005_participacao_experimental` no ambiente apropriado.
-- [ ] Criar serializer de entrada.
-- [ ] Criar endpoint `POST /api/agendamentos/`.
+- [ ] Rodar `python manage.py migrate` depois de cada `git pull`.
+- [x] Criar serializer de entrada.
+- [x] Criar endpoint `POST /api/agendamentos/`.
 - [ ] Obter `registrado_por` do usuário autenticado.
-- [ ] Buscar IDs e rejeitar registros inexistentes ou sem acesso.
-- [ ] Chamar exclusivamente `criar_agendamento()`.
-- [ ] Normalizar `ValidationError` no formato acordado.
-- [ ] Implementar autenticação e permissões.
+- [x] Buscar IDs e rejeitar registros inexistentes.
+- [x] Chamar exclusivamente `criar_agendamento()`.
+- [x] Normalizar `ValidationError` no formato acordado.
+- [x] Implementar autenticação.
+- [ ] Implementar controle de acesso por perfil.
 - [ ] Implementar endpoints auxiliares de consulta.
 - [ ] Definir paginação e filtros da agenda.
-- [ ] Criar endpoints que chamem `cancelar_participacao()` e `cancelar_agendamento()`.
+- [x] Criar endpoints que chamem `cancelar_participacao()` e `cancelar_agendamento()`.
 - [ ] Criar um serviço próprio antes de expor remarcação.
 
 ### Front-end
@@ -489,7 +495,6 @@ Esses itens devem ser tratados em etapas posteriores, sem alterar o contrato bá
 - `src/agendamentos/models.py`: estruturas de agendamento e participação, além das validações diretas.
 - `src/agendamentos/services.py`: criação transacional e regras que envolvem múltiplos recursos.
 - `src/agendamentos/tests.py`: exemplos executáveis dos comportamentos esperados.
-- `src/agendamentos/migrations/0001_initial.py`: criação das tabelas e índices.
-- `src/agendamentos/migrations/0005_participacao_experimental.py`: tipo da participação, recepcionista e garantia de uma experimental.
+- `src/agendamentos/migrations/0001_initial.py`: criação das tabelas de espaço, equipamento, agendamento e participação.
 - `src/usuarios/models.py`: validação do atleta, dados da experimental e disponibilidade profissional.
-
+- `src/agendamentos/api/`: serializers, views, rotas e testes da API REST.
