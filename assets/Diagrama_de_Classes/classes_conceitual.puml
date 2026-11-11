@@ -1,6 +1,6 @@
 @startuml classes_conceitual
 !pragma layout smetana
-title Playmakerz: Diagrama de Classes Conceitual (v0.2)
+title Playmakerz: Diagrama de Classes Conceitual (v0.3)
 
 skinparam shadowing false
 skinparam classAttributeIconSize 0
@@ -18,16 +18,25 @@ abstract class Usuario {
 }
 
 class Atleta {
+  nome
+  email
+  telefone
   dataDeNascimento
   objetivos
 }
 
 class Responsavel {
-  parentesco
+  telefone
 }
 
 class Profissional {
   especialidade
+}
+
+class DisponibilidadeProfissional {
+  diaSemana
+  horaInicio
+  horaFim
 }
 
 class Funcionario {
@@ -46,26 +55,20 @@ class Equipamento {
 }
 
 class Agendamento {
-  data
-  horarioDeInicio
-  horarioDeTermino
+  inicio
+  fim
+  modalidade
+  limiteParticipantes
+  situacao
+  observacoes
+  motivoCancelamento
+}
+
+class ParticipacaoAgendamento {
   tipo
   situacao
-}
-
-class Recorrencia {
-  frequencia
-  dataDeTermino
-}
-
-class Presenca {
-  situacao
-}
-
-class Notificacao {
-  tipo
-  mensagem
-  dataDeEnvio
+  observacoes
+  motivoCancelamento
 }
 
 Usuario <|-- Atleta
@@ -73,28 +76,27 @@ Usuario <|-- Responsavel
 Usuario <|-- Profissional
 Usuario <|-- Funcionario
 
-Atleta "*" -- "0..*" Responsavel : e responsavel por <
+Responsavel "0..1" -- "0..*" Atleta : responsavel por >
 
-Agendamento "*" -- "1..*" Atleta : participantes
-(Agendamento, Atleta) .. Presenca
+Agendamento "1" -- "1..*" ParticipacaoAgendamento : possui >
+Atleta "1" -- "0..*" ParticipacaoAgendamento : participa >
+Profissional "1" -- "0..*" DisponibilidadeProfissional : possui >
 Agendamento "*" -- "1" Profissional : conduzido por >
 Agendamento "*" -- "1" Espaco : ocorre em >
 Agendamento "*" -- "0..*" Equipamento : utiliza >
-Agendamento "*" -- "0..1" Recorrencia : pertence a >
 Agendamento "*" -- "1" Funcionario : registrado por >
 
-Notificacao "*" -- "1" Usuario : destinatario >
-Notificacao "*" -- "0..1" Agendamento : refere-se a >
-
 note bottom of Agendamento
-  Um Atleta, Profissional, Espaco ou
-  Equipamento nao pode estar em dois
-  Agendamentos no mesmo horario.
+  Verificar conflitos de horario de
+  atletas, profissionais e equipamentos.
+
+  O espaco deve respeitar sua capacidade
+  considerando as vagas reservadas.
 end note
 
 note bottom of Atleta
   Atleta menor de idade precisa
-  de pelo menos um Responsavel.
+  de um Responsavel.
 end note
 
 @enduml

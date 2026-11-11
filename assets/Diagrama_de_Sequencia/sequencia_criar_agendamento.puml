@@ -1,0 +1,93 @@
+@startuml sequencia_criar_agendamento
+title Playmakerz: Sequência do caso de uso Criar agendamento individual (v0.1)
+
+skinparam shadowing false
+skinparam sequenceMessageAlign left
+skinparam ParticipantBackgroundColor #FFFFFF
+skinparam ParticipantBorderColor #1F3A5F
+skinparam ActorBorderColor #1F3A5F
+skinparam ActorBackgroundColor #FFFFFF
+skinparam SequenceLifeLineBorderColor #1F3A5F
+skinparam ArrowColor #1F3A5F
+skinparam NoteBackgroundColor #FFF8DC
+skinparam NoteBorderColor #1F3A5F
+autonumber
+
+actor "Recepção" as Rec
+boundary "Tela de\nAgendamento" as Tela
+control "API de\nAgendamentos" as Api
+control "Serviço de\nAgendamento" as Serv
+entity "Profissional" as Prof
+entity "Atleta" as Atl
+entity "Espaço" as Esp
+entity "Equipamento" as Eqp
+entity "Agendamento" as Agd
+entity "Participação no\nAgendamento" as Part
+
+note over Rec, Tela
+  Pré-condição: a recepção está autenticada.
+  Atleta, profissional e espaço estão cadastrados e ativos.
+end note
+
+== Consulta de horários livres (RF08) ==
+Rec -> Tela : escolhe o profissional e o dia
+Tela -> Api : GET /profissionais/{id}/horarios/?data=
+Api -> Serv : listar_horarios_profissional(profissional, data)
+Serv -> Prof : busca a disponibilidade do dia
+Prof --> Serv : janelas de atendimento
+Serv -> Agd : busca os agendamentos do profissional no dia
+Agd --> Serv : horários ocupados
+Serv --> Api : blocos de 30 min (livre, individual ou grupo)
+Api --> Tela : 200 OK com os blocos
+Tela --> Rec : mostra os horários livres
+
+== Criação do agendamento (RF09 e RF10) ==
+Rec -> Tela : escolhe horário, atleta, espaço\ne equipamentos (opcional) e confirma
+Tela -> Api : POST /agendamentos/\n(profissional, espaco, atletas, equipamentos,\ninicio, fim, registrado_por)
+
+alt algum id informado não existe ou falta campo
+  Api --> Tela : 400 Bad Request (erro por campo)
+  Tela --> Rec : destaca os campos com erro
+else dados válidos
+  Api -> Serv : criar_agendamento(...)
+  Serv -> Atl : valida atleta ativo e, se menor de 18 anos,\ncom responsável vinculado
+  Atl --> Serv : resultado
+  Serv -> Prof : valida intervalo de 30 min, janelas de\nfuncionamento e disponibilidade
+  Prof --> Serv : resultado
+  Serv -> Agd : verifica conflito de profissional e de atletas\nnesse horário (agendamentos não cancelados)
+  Agd --> Serv : resultado
+  Serv -> Esp : verifica a capacidade do espaço\ne as vagas já reservadas
+  Esp --> Serv : resultado
+  Serv -> Eqp : verifica se os equipamentos\nestão livres nesse horário
+  Eqp --> Serv : resultado
+
+  alt encontrou algum conflito ou regra violada
+    Serv --> Api : ValidationError com os motivos por campo
+    Api --> Tela : 400 Bad Request
+    Tela --> Rec : informa o que está ocupado ou inválido
+    note right of Rec
+      A recepção ajusta os dados e envia de novo
+      (volta ao passo de criação) ou desiste.
+    end note
+  else nenhum conflito
+    Serv -> Agd : salva o agendamento
+    Serv -> Part : cria a participação do atleta
+    Serv -> Eqp : reserva os equipamentos
+    Agd --> Serv : agendamento criado
+    Serv --> Api : agendamento
+    Api --> Tela : 201 Created com os dados do agendamento
+    Tela --> Rec : exibe a confirmação
+  end
+end
+
+note over Serv, Part
+  Tudo é feito em uma única transação: se algo falhar,
+  nada é salvo e nenhum recurso fica reservado.
+end note
+
+note over Rec, Agd
+  Fora do escopo desta versão: lembretes ao atleta ou responsável
+  e registro de alterações, previstos no caso de uso.
+end note
+
+@enduml
