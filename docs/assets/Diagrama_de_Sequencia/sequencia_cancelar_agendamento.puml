@@ -1,0 +1,72 @@
+@startuml sequencia_cancelar_agendamento
+title Playmakerz: Sequência do caso de uso Cancelar agendamento (v0.1)
+
+skinparam shadowing false
+skinparam sequenceMessageAlign left
+skinparam ParticipantBackgroundColor #FFFFFF
+skinparam ParticipantBorderColor #1F3A5F
+skinparam ActorBorderColor #1F3A5F
+skinparam ActorBackgroundColor #FFFFFF
+skinparam SequenceLifeLineBorderColor #1F3A5F
+skinparam ArrowColor #1F3A5F
+skinparam NoteBackgroundColor #FFF8DC
+skinparam NoteBorderColor #1F3A5F
+autonumber
+
+actor "Recepção" as Rec
+boundary "Tela de\nAgendamento" as Tela
+control "API de\nAgendamentos" as Api
+control "Serviço de\nAgendamento" as Serv
+entity "Agendamento" as Agd
+entity "Participação\nno Agendamento" as Part
+
+note over Rec, Tela
+  Pré-condição: a recepção está autenticada
+  e o agendamento existe e ainda não foi realizado.
+end note
+
+Rec -> Tela : seleciona o agendamento,\nescolhe Cancelar e informa o motivo
+Tela -> Api : POST /agendamentos/{id}/cancelar/\n(motivo)
+Api -> Agd : busca o agendamento pelo id
+
+alt agendamento não encontrado
+  Agd --> Api : não existe
+  Api --> Tela : 404 Not Found
+  Tela --> Rec : informa que o agendamento não existe
+else agendamento encontrado
+  Agd --> Api : agendamento
+  Api -> Serv : cancelar_agendamento(agendamento, motivo)
+  Serv -> Agd : consulta a situação do agendamento
+  Serv -> Part : consulta as participações
+
+  alt já estava cancelado
+    Serv --> Api : retorna o agendamento sem alterar nada
+    Api --> Tela : 200 OK
+    Tela --> Rec : mostra o agendamento cancelado
+  else não está agendado (já realizado) ou tem presença ou falta registrada
+    Serv --> Api : ValidationError
+    Api --> Tela : 400 Bad Request
+    Tela --> Rec : informa que não pode ser cancelado
+  else pode ser cancelado
+    Serv -> Part : marca as participações confirmadas como canceladas\n(motivo e data)
+    Serv -> Agd : muda a situação para cancelado\n(motivo e data)
+    Agd --> Serv : agendamento atualizado
+    Serv --> Api : agendamento
+    Api --> Tela : 200 OK com os dados do agendamento
+    Tela --> Rec : exibe a confirmação do cancelamento
+  end
+end
+
+note over Serv, Part
+  Tudo é feito em uma única transação.
+  Os recursos ficam livres porque o conflito de horário
+  só considera agendamentos não cancelados.
+end note
+
+note over Rec, Part
+  Fora do escopo desta versão: avisar o profissional e o atleta
+  ou responsável, e o registro de quem cancelou.
+  Também não há ainda regra de permissão por perfil.
+end note
+
+@enduml
