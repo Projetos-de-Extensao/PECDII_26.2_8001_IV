@@ -1,23 +1,23 @@
----
-hide:
-  - navigation
-  - toc
----
+# Construção
 
-# PECDII_26.2_8001 { style="display:none" }
+> Objetivo: Desenvolver o sistema de gestão da Playmakerz com base nos requisitos e na arquitetura definidos pela equipe.
 
-<div class="module-cards grid four-cols">
+## Principais atividades
 
-  <div class="card module-card" data-module-id="PECDII_26.2_8001_IV">
-    <div class="card-header">
-      Grupo IV
-    </div>
-    <div class="card-content">
-      <p class="contributors">Daniel Gusmão, Marcos Vinicius, Maria Eduarda, Pedro Henrique</p>
-      <a href="https://github.com/Projetos-de-Extensao/PECDII_26.2_8001_IV" class="button primary-btn">
-        Ver Repositório
-      </a>
-    </div>
-  </div>
+* Desenvolver o cadastro de usuários, profissionais e alunos;
 
-</div>
+* Implementar o controle de espaços e equipamentos;
+
+* Criar o sistema de agendamentos e horários recorrentes;
+
+* Aplicar diferentes níveis de acesso;
+
+* Priorizar a segurança dos dados de crianças e adolescentes;
+
+* Realizar testes e corrigir os problemas encontrados;
+
+* Entregar versões parciais durante o desenvolvimento.
+
+Fora do escopo desta entrega: horários recorrentes, registro de presença e falta, e lembretes e notificações. Esses itens ficam para etapas posteriores.
+
+* Produto principal: Sistema funcional para auxiliar na organização e no atendimento da Playmakerz.
