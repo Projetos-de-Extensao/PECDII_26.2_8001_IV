@@ -13,6 +13,10 @@ title: Casos de Uso
     Esta versão foi atualizada depois do início da construção do sistema. A especificação (seção 3) descreve o comportamento que o código realmente tem, indicando como <b>planejado</b> o que ainda não foi construído. Também foram incluídos quatro casos de uso que surgiram durante o desenvolvimento: Consultar horários do profissional, Inscrever atleta em atividade em grupo, Agendar aula experimental e Cancelar participação.
 </p>
 
+<p align = "justify">
+    <b>Fora do escopo desta entrega:</b> agendamento recorrente, registro de presença e falta, lembretes e notificações e bloqueio de espaço ou equipamento para manutenção, conforme a seção 12 do Guia de integração (Transição). Esses casos de uso continuam descritos como planejados, para orientar as próximas etapas.
+</p>
+
 ---
 
 ## 2. Atores
@@ -371,7 +375,7 @@ title: Casos de Uso
 
 | Campo | Descrição |
 |-------|-----------|
-| **Descrição** | Cria uma série de agendamentos que se repetem em dias e horários definidos, reduzindo o trabalho repetitivo da recepção. |
+| **Descrição** | Cria uma série de agendamentos que se repetem em dias e horários definidos, reduzindo o trabalho repetitivo da recepção. Fora do escopo desta entrega. |
 | **Atores** | Recepção, Coordenador, Gestor. Sistema (secundário). |
 | **Pré-condições** | As mesmas de Criar agendamento individual ou Criar agendamento em grupo. |
 | **Pós-condições** | Série de agendamentos criada, cada ocorrência com os recursos reservados. |
@@ -542,7 +546,7 @@ title: Casos de Uso
 
 | Campo | Descrição |
 |-------|-----------|
-| **Descrição** | Registra se o atleta compareceu, faltou ou teve o atendimento cancelado. |
+| **Descrição** | Registra se o atleta compareceu, faltou ou teve o atendimento cancelado. Fora do escopo desta entrega. |
 | **Atores** | Profissional, Recepção, Coordenador. |
 | **Pré-condições** | Agendamento confirmado cujo horário já começou ou terminou. |
 | **Pós-condições** | Agendamento com status "realizado" ou "falta"; histórico de presença atualizado. |
@@ -569,7 +573,7 @@ title: Casos de Uso
 
 | Campo | Descrição |
 |-------|-----------|
-| **Descrição** | Torna um espaço ou equipamento indisponível por um período, impedindo novos agendamentos e alertando os já existentes. |
+| **Descrição** | Torna um espaço ou equipamento indisponível por um período, impedindo novos agendamentos e alertando os já existentes. Fora do escopo desta entrega. |
 | **Atores** | Manutenção, Coordenador, Gestor. Sistema (secundário). |
 | **Pré-condições** | Usuário autenticado com permissão. Espaço ou equipamento cadastrado. |
 | **Pós-condições** | Bloqueio ativo no período; agendamentos afetados sinalizados. |
@@ -621,7 +625,7 @@ title: Casos de Uso
 
 | Campo | Descrição |
 |-------|-----------|
-| **Descrição** | Envia automaticamente lembretes de atendimento e avisos de criação, remarcação e cancelamento aos envolvidos. |
+| **Descrição** | Envia automaticamente lembretes de atendimento e avisos de criação, remarcação e cancelamento aos envolvidos. Fora do escopo desta entrega. |
 | **Atores** | Sistema (principal). Profissional, Atleta e Responsável (destinatários). |
 | **Pré-condições** | Agendamento criado, alterado ou cancelado, ou horário de lembrete programado. Destinatário com contato válido. |
 | **Pós-condições** | Mensagem enviada e envio registrado. |
@@ -696,4 +700,4 @@ Fonte: [`casos_de_uso_consultas.puml`](../assets/Casos_de_Uso/casos_de_uso_consu
 | Versão | Data       | Autor(es)                | Revisor(es) | Resumo da alteração                       |
 | ------ | ---------- | ------------------------ | ----------- | ----------------------------------------- |
 | v0.1   | 29/09/2026 | Pedro Henrique Marques Loredo de Paula | Marcus    | Criação do Diagrama de Classes de uso |
-| v0.2   | 10/11/2026 | Pedro Henrique Marques Loredo de Paula | pendente  | implementação de quatro novos casos de uso (consultar horários, inscrever em grupo, aula experimental e cancelar participação) e diagramas |
+| v0.2   | 10/11/2026 | Pedro Henrique Marques Loredo de Paula | Marcus  | implementação de quatro novos casos de uso (consultar horários, inscrever em grupo, aula experimental e cancelar participação) e diagramas |
