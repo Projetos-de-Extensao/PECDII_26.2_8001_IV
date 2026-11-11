@@ -11,7 +11,7 @@ skinparam NoteBackgroundColor #FFF8DC
 hide empty methods
 hide circle
 
-class Usuario {
+abstract class Usuario {
   nome
   email
   telefone
