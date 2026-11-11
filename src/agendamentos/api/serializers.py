@@ -6,8 +6,8 @@ from agendamentos.models import ParticipacaoAgendamento
 from agendamentos.models import Espaco
 from agendamentos.models import Equipamento
 from usuarios.models import Atleta
-from usuarios.models import Funcionario
 from usuarios.models import Profissional
+from usuarios.models import Funcionario
 
 
 class EspacoSerializer(serializers.ModelSerializer):
@@ -155,3 +155,14 @@ class CancelamentoSerializer(serializers.Serializer):
         allow_blank=True,
         default="",
     )
+
+class ProfissionalSerializer(serializers.ModelSerializer):
+    nome = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Profissional
+        fields = ["id", "nome", "especialidade", "ativo"]
+
+    def get_nome(self, profissional):
+        user = profissional.usuario.user
+        return user.get_full_name() or user.username

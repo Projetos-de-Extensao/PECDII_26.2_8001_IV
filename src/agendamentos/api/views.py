@@ -4,20 +4,24 @@ from rest_framework.decorators import action
 from rest_framework import viewsets
 from rest_framework import status
 from rest_framework.response import Response
+from datetime import datetime
 
+from usuarios.models import Atleta
+from usuarios.models import Profissional
 from agendamentos.models import Espaco
 from agendamentos.models import Equipamento
-from usuarios.models import Atleta
 from agendamentos.models import Agendamento
 from agendamentos.models import ParticipacaoAgendamento
 from agendamentos.services import criar_agendamento
 from agendamentos.services import cancelar_agendamento
 from agendamentos.services import inscrever_em_atividade_grupo
 from agendamentos.services import cancelar_participacao as cancelar_participacao_service
+from agendamentos.services import listar_horarios_profissional
 
 from .serializers import EspacoSerializer
 from .serializers import EquipamentoSerializer
 from .serializers import AtletaSerializer
+from .serializers import ProfissionalSerializer
 from .serializers import AgendamentoSerializer
 from .serializers import CriarAgendamentoSerializer
 from .serializers import CancelamentoSerializer
@@ -36,6 +40,34 @@ class EquipamentoViewSet(viewsets.ModelViewSet):
 class AtletaViewSet(viewsets.ModelViewSet):
     queryset = Atleta.objects.all().order_by("nome")
     serializer_class = AtletaSerializer
+
+class ProfissionalViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Profissional.objects.filter(ativo=True).order_by("id")
+    serializer_class = ProfissionalSerializer
+    @action(detail=True, methods=["get"])
+    def horarios(self, request, pk=None):
+        profissional = self.get_object()
+
+        texto_data = request.query_params.get("data")
+        if not texto_data:
+            return Response(
+                {"data": ["Informe a data no formato AAAA-MM-DD."]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        try:
+            data = datetime.strptime(texto_data, "%Y-%m-%d").date()
+        except ValueError:
+            return Response(
+                {"data": ["Data inválida. Use o formato AAAA-MM-DD."]},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        horarios = listar_horarios_profissional(
+            profissional=profissional,
+            data=data,
+        )
+        return Response(horarios)
 
 class AgendamentoViewSet(viewsets.ViewSet):
     
