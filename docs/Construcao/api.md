@@ -17,7 +17,7 @@ Para rodar a API na sua máquina ou no Codespaces, siga estes passos:
 2. Entre na pasta `src` e crie o banco de dados com `python manage.py migrate`.
 3. Crie um usuário para entrar no sistema com `python manage.py createsuperuser`.
 4. Ligue o servidor com `python manage.py runserver`.
-5. Abra o endereço `/api/` no navegador e entre com o usuário que você criou.
+5. Abra `/admin/login/` no navegador, entre com o superusuário que você criou e depois acesse `/api/` na mesma sessão.
 
 !!! note "Se estiver usando o Codespaces"
     A página da API mostra links com `localhost:8000`, mas eles não abrem no Codespaces. Use o endereço da porta 8000 que o Codespaces gera (na aba **Portas**) e continue com o resto da rota, por exemplo `/api/profissionais/`.
@@ -109,8 +109,8 @@ As rotas de envio (POST, PUT e PATCH) recebem os dados em JSON. Estes são os ca
 | Equipamentos | `nome`, `tipo` | |
 | Atletas | `nome`, `email`, `telefone`, `data_de_nascimento`, `objetivos`, `ativo`, `responsavel` | O telefone precisa ter pelo menos 11 dígitos. A data tem o formato `AAAA-MM-DD` e não pode ser no futuro. O campo `idade` é calculado pela API e só aparece na resposta. O `responsavel` é o id de um responsável |
 | Criar agendamento | `profissional`, `espaco`, `atletas`, `registrado_por`, `inicio`, `fim` | Todos são obrigatórios. `profissional`, `espaco` e `registrado_por` são ids, e `atletas` é uma lista de ids. As datas ficam no formato `AAAA-MM-DDTHH:MM` |
-| Criar agendamento (opcionais) | `equipamentos`, `modalidade`, `limite_participantes`, `observacoes`, `atletas_experimentais` | A `modalidade` pode ser `individual` ou `grupo` |
-| Inscrever em um agendamento | `atleta`, `experimental`, `registrado_por` | Só o `atleta` é obrigatório. O `experimental` é `true` ou `false` (o padrão é `false`) |
+| Criar agendamento (opcionais) | `equipamentos`, `modalidade`, `limite_participantes`, `observacoes`, `atletas_experimentais` | A `modalidade` pode ser `individual` ou `grupo`. Se usar `atletas_experimentais`, o `registrado_por` precisa ser um funcionário ativo com cargo `recepcionista`. |
+| Inscrever em um agendamento | `atleta`, `experimental`, `registrado_por` | O `atleta` é obrigatório. O `experimental` é `true` ou `false` (o padrão é `false`). Se `experimental` for `true`, o `registrado_por` também é obrigatório e deve ser o id de um funcionário ativo com cargo `recepcionista` |
 | Cancelar agendamento ou participação | `motivo` | O motivo é opcional |
 
 As regras de negócio (por exemplo, conflito de horário ou grupo lotado) são aplicadas pelos services do sistema. Quando alguma regra é quebrada, a API responde com o código 400 e explica o motivo no corpo da resposta.
@@ -173,7 +173,7 @@ Resposta (código 200, mostrando só os dois primeiros blocos):
 ]
 ```
 
-Se o profissional não atende naquele dia da semana, a resposta é uma lista vazia (`[]`). Quando já existe um agendamento no horário, o campo `disponivel` fica `false`.
+Se o profissional não atende naquele dia da semana, a resposta é uma lista vazia (`[]`). Um horário sem agendamento vem com `tipo: "livre"` e `disponivel: true`. Se já existe um agendamento individual, ou um grupo lotado, o `disponivel` fica `false`. Se for um grupo com vagas, vem com `tipo: "grupo"` e `disponivel: true`, e os campos `inscritos` e `limite` mostram a ocupação. Nesse caso, use o `agendamento_id` na rota de inscrição do agendamento que já existe, em vez de criar outro agendamento.
 
 ### 5.3 Erros ao consultar os horários
 
