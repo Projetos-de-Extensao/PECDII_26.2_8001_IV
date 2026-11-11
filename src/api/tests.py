@@ -8,7 +8,6 @@ from rest_framework.test import APITestCase
 
 # Models necessários para criar e consultar os dados dos testes.
 from agendamentos.models import Agendamento, ParticipacaoAgendamento
-from app.models import Espaco
 from usuarios.models import (
     Atleta,
     DisponibilidadeProfissional,
