@@ -96,7 +96,7 @@ end note
 
 note bottom of Atleta
   Atleta menor de idade precisa
-  de pelo menos um Responsavel.
+  de um Responsavel.
 end note
 
 @enduml
