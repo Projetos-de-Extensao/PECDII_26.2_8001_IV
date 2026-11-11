@@ -188,8 +188,6 @@ não deverá conceder automaticamente permissões privilegiadas.
 }
 
 @endsalt
-
-@endsalt
 ```
 
 ### Consulta e Criação de Agendamentos
