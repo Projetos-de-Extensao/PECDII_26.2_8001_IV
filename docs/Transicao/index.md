@@ -1,14 +1,14 @@
 # Guia de integração front-end — Agendamentos Playmakerz
 
 **Data:** 20/10/2026  
-**Status:** núcleo e interface interna implementados; API REST ainda pendente
+**Status:** núcleo, interface interna e API REST implementados
 **Público:** equipes de front-end, backend e QA
 
 ## 1. Objetivo
 
 Este documento explica como a interface de agendamentos deverá conversar com o backend do Playmakerz, quais regras já existem e o que ainda precisa ser construído antes da integração.
 
-> Importante: existe uma interface interna de conferência em `/agendamentos/`, protegida pelo login de funcionário do Django Admin. A API REST destinada ao front-end definitivo ainda não foi implementada.
+> Importante: existe uma interface interna de conferência em `/agendamentos/`, protegida pelo login de funcionário do Django Admin. A API REST destinada ao front-end está implementada e descrita na página [API REST](../Construcao/api.md).
 
 ## 2. Situação atual
 
@@ -25,12 +25,12 @@ Este documento explica como a interface de agendamentos deverá conversar com o 
 | Capacidade compartilhada do espaço | Implementada pela soma dos limites reservados |
 | Validação de menor com responsável | Implementada |
 | Estados `agendado`, `cancelado` e `realizado` | Modelados |
-| API REST de agendamentos | Não implementada |
+| API REST de agendamentos | Implementada (veja [API REST](../Construcao/api.md)) |
 | Tela interna de agendamento | Implementada em `/agendamentos/` |
 | Consulta de blocos de 30 minutos | Implementada na interface interna |
 | Remarcação | Não implementada |
 | Cancelamento individual e total | Implementado no serviço de backend |
-| Cancelamento por endpoint próprio | Não implementado |
+| Cancelamento por endpoint próprio | Implementado |
 | Planos, créditos e estornos | Fora do escopo atual |
 | Recorrência e notificações | Não implementadas |
 
@@ -39,7 +39,7 @@ Este documento explica como a interface de agendamentos deverá conversar com o 
 ```text
 Interface web
     ↓ requisição HTTP
-API Django/DRF (a implementar)
+API Django/DRF
     ↓ converte IDs em objetos e identifica o usuário autenticado
 services.py — criar_agendamento()
     ↓ valida regras e conflitos em uma transação
@@ -222,7 +222,7 @@ O serviço impede inscrição duplicada, conflito do atleta e entrada depois que
 
 ## 7. Contrato recomendado para a API
 
-Esta seção é uma proposta de contrato. Os endpoints ainda precisam ser implementados e alinhados entre as equipes.
+Esta seção é a proposta de contrato que originou a API. Os endpoints implementados estão descritos na página [API REST](../Construcao/api.md); em caso de diferença, vale a página da API.
 
 ### 7.1 Criar agendamento
 
