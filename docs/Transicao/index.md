@@ -416,17 +416,18 @@ Não usar somente cor para indicar erros. Mensagens devem ser legíveis por leit
 
 ### Backend — pendências antes da integração
 
-- [ ] Aplicar as migrações de usuários até `0003_atleta_email` e de agendamentos até `0005_participacao_experimental` no ambiente apropriado.
-- [ ] Criar serializer de entrada.
-- [ ] Criar endpoint `POST /api/agendamentos/`.
+- [ ] Rodar `python manage.py migrate` depois de cada `git pull`.
+- [x] Criar serializer de entrada.
+- [x] Criar endpoint `POST /api/agendamentos/`.
 - [ ] Obter `registrado_por` do usuário autenticado.
-- [ ] Buscar IDs e rejeitar registros inexistentes ou sem acesso.
-- [ ] Chamar exclusivamente `criar_agendamento()`.
-- [ ] Normalizar `ValidationError` no formato acordado.
-- [ ] Implementar autenticação e permissões.
+- [x] Buscar IDs e rejeitar registros inexistentes.
+- [x] Chamar exclusivamente `criar_agendamento()`.
+- [x] Normalizar `ValidationError` no formato acordado.
+- [x] Implementar autenticação.
+- [ ] Implementar controle de acesso por perfil.
 - [ ] Implementar endpoints auxiliares de consulta.
 - [ ] Definir paginação e filtros da agenda.
-- [ ] Criar endpoints que chamem `cancelar_participacao()` e `cancelar_agendamento()`.
+- [x] Criar endpoints que chamem `cancelar_participacao()` e `cancelar_agendamento()`.
 - [ ] Criar um serviço próprio antes de expor remarcação.
 
 ### Front-end
@@ -494,7 +495,6 @@ Esses itens devem ser tratados em etapas posteriores, sem alterar o contrato bá
 - `src/agendamentos/models.py`: estruturas de agendamento e participação, além das validações diretas.
 - `src/agendamentos/services.py`: criação transacional e regras que envolvem múltiplos recursos.
 - `src/agendamentos/tests.py`: exemplos executáveis dos comportamentos esperados.
-- `src/agendamentos/migrations/0001_initial.py`: criação das tabelas e índices.
-- `src/agendamentos/migrations/0005_participacao_experimental.py`: tipo da participação, recepcionista e garantia de uma experimental.
+- `src/agendamentos/migrations/0001_initial.py`: criação das tabelas de espaço, equipamento, agendamento e participação.
 - `src/usuarios/models.py`: validação do atleta, dados da experimental e disponibilidade profissional.
-
+- `src/agendamentos/api/`: serializers, views, rotas e testes da API REST.
