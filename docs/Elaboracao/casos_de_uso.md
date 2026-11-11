@@ -46,22 +46,22 @@ Dos 22 casos de uso, 11 estão implementados, 4 estão parciais e 7 estão plane
 
 | Caso de uso | Situação | Onde está no código | Testes automatizados |
 |-------------|----------|---------------------|----------------------|
-| [Autenticar usuário](#autenticar-usuario) | Parcial | Login do Django (`/admin/login/`); a API aceita sessão ou Basic Auth (`project/settings.py`) | `agendamentos/test_interface.py`; `api/tests.py` |
+| [Autenticar usuário](#autenticar-usuario) | Parcial | Login do Django (`/admin/login/`); a API aceita sessão ou Basic Auth (`project/settings.py`) | `agendamentos/test_interface.py`; `agendamentos/api/tests.py` |
 | [Gerenciar usuários e perfis de permissão](#gerenciar-usuarios-e-perfis-de-permissao) | Parcial | Django admin: `Usuario`, `Responsavel`, `Profissional`, `Funcionario` (`usuarios/admin.py`) | `usuarios/tests.py`; `usuarios/test_admin.py` |
-| [Gerenciar atletas](#gerenciar-atletas) | Implementado | API `/api/atletas/` (`api/views.py`); Django admin; cadastro rápido na tela de agendamento | `api/tests.py` (`AtletaAPITests`, `AtletaModelTests`); `usuarios/tests.py` |
+| [Gerenciar atletas](#gerenciar-atletas) | Implementado | API `/api/atletas/` (`/agendamentos/api/views.py`); Django admin; cadastro rápido na tela de agendamento | `agendamentos/api/tests.py` (`AtletaAPITests`, `AtletaModelTests`); `usuarios/tests.py` |
 | [Gerenciar profissionais](#gerenciar-profissionais) | Parcial | Django admin, com horários de disponibilidade (`usuarios/admin.py`) | `usuarios/tests.py`; `usuarios/test_admin.py` |
-| [Gerenciar espaços](#gerenciar-espacos) | Implementado | API `/api/espacos/`; Django admin | `api/tests.py` (`EspacoAPITests`, `EspacoModelTests`) |
-| [Gerenciar equipamentos](#gerenciar-equipamentos) | Implementado | API `/api/equipamentos/`; Django admin | `api/tests.py` (`EquipamentoAPITests`, `EquipamentoModelTests`) |
+| [Gerenciar espaços](#gerenciar-espacos) | Implementado | API `/api/espacos/`; Django admin | `agendamentos/api/tests.py` (`EspacoAPITests`, `EspacoModelTests`) |
+| [Gerenciar equipamentos](#gerenciar-equipamentos) | Implementado | API `/api/equipamentos/`; Django admin | `agendamentos/api/tests.py` (`EquipamentoAPITests`, `EquipamentoModelTests`) |
 | [Consultar horários do profissional](#consultar-horarios-do-profissional) | Implementado | `GET /agendamentos/horarios/`; grade da tela de novo agendamento; `listar_horarios_profissional` (`agendamentos/services.py`) | `agendamentos/tests.py`; `agendamentos/test_interface.py` |
-| [Criar agendamento individual](#criar-agendamento-individual) | Implementado | `POST /api/agendamentos/`; tela `/agendamentos/novo/`; `criar_agendamento` (`agendamentos/services.py`) | `api/tests.py` (`AgendamentoAPITests`, `RecursosAgendamentoAPITests`); `agendamentos/tests.py`; `agendamentos/test_interface.py` |
-| [Criar agendamento em grupo](#criar-agendamento-em-grupo) | Implementado | Os mesmos de agendamento individual, com modalidade "grupo" | `api/tests.py`; `agendamentos/tests.py`; `agendamentos/test_interface.py` |
-| [Inscrever atleta em atividade em grupo](#inscrever-atleta-em-atividade-em-grupo) | Implementado | `POST /api/agendamentos/{id}/inscrever/`; tela de novo agendamento; `inscrever_em_atividade_grupo` | `api/tests.py`; `agendamentos/tests.py`; `agendamentos/test_interface.py` |
+| [Criar agendamento individual](#criar-agendamento-individual) | Implementado | `POST /api/agendamentos/`; tela `/agendamentos/novo/`; `criar_agendamento` (`agendamentos/services.py`) | `agendamentos/api/tests.py` (`AgendamentoAPITests`, `RecursosAgendamentoAPITests`); `agendamentos/tests.py`; `agendamentos/test_interface.py` |
+| [Criar agendamento em grupo](#criar-agendamento-em-grupo) | Implementado | Os mesmos de agendamento individual, com modalidade "grupo" | `agendamentos/api/tests.py`; `agendamentos/tests.py`; `agendamentos/test_interface.py` |
+| [Inscrever atleta em atividade em grupo](#inscrever-atleta-em-atividade-em-grupo) | Implementado | `POST /api/agendamentos/{id}/inscrever/`; tela de novo agendamento; `inscrever_em_atividade_grupo` | `agendamentos/api/tests.py`; `agendamentos/tests.py`; `agendamentos/test_interface.py` |
 | [Agendar aula experimental](#agendar-aula-experimental) | Implementado | Cadastro rápido na tela de novo agendamento; parâmetro `atletas_experimentais` da API | `agendamentos/tests.py`; `agendamentos/test_interface.py` |
 | [Criar agendamento recorrente](#criar-agendamento-recorrente) | Planejado | Não existe | — |
-| [Verificar conflitos de horário](#verificar-conflitos-de-horario) | Implementado | `_validar_conflitos` e `_validar_disponibilidade` (`agendamentos/services.py`) | `api/tests.py`; `agendamentos/tests.py` |
+| [Verificar conflitos de horário](#verificar-conflitos-de-horario) | Implementado | `_validar_conflitos` e `_validar_disponibilidade` (`agendamentos/services.py`) | `/agendamentos/api/tests.py`; `agendamentos/tests.py` |
 | [Remarcar agendamento](#remarcar-agendamento) | Planejado | Não existe | — |
-| [Cancelar agendamento](#cancelar-agendamento) | Implementado | `POST /api/agendamentos/{id}/cancelar/`; tela de detalhe; `cancelar_agendamento` | `api/tests.py`; `agendamentos/tests.py`; `agendamentos/test_interface.py` |
-| [Cancelar participação](#cancelar-participacao) | Implementado | `POST /api/agendamentos/{id}/participacoes/{participacao_id}/cancelar/`; tela de detalhe; `cancelar_participacao` | `api/tests.py`; `agendamentos/tests.py`; `agendamentos/test_interface.py` |
+| [Cancelar agendamento](#cancelar-agendamento) | Implementado | `POST /api/agendamentos/{id}/cancelar/`; tela de detalhe; `cancelar_agendamento` | `agendamentos/api/tests.py`; `agendamentos/tests.py`; `agendamentos/test_interface.py` |
+| [Cancelar participação](#cancelar-participacao) | Implementado | `POST /api/agendamentos/{id}/participacoes/{participacao_id}/cancelar/`; tela de detalhe; `cancelar_participacao` | `agendamentos/api/tests.py`; `agendamentos/tests.py`; `agendamentos/test_interface.py` |
 | [Consultar agenda](#consultar-agenda) | Parcial | Telas `/agendamentos/` e `/agendamentos/{id}/` (`agendamentos/views.py`) | `agendamentos/test_interface.py` |
 | [Registrar presença e falta](#registrar-presenca-e-falta) | Planejado | Só o modelo: `ParticipacaoAgendamento` já tem as situações de presença e falta | — |
 | [Bloquear espaço ou equipamento para manutenção](#bloquear-espaco-ou-equipamento-para-manutencao) | Planejado | Não existe | — |
