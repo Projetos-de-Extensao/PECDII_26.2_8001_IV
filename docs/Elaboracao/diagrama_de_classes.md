@@ -31,16 +31,15 @@ Fonte: [`classes_conceitual.puml`](../assets/Diagrama_de_Classes/classes_conceit
 | Classe | Descrição curta | Atributos de domínio |
 | ------ | --------------- | -------------------- |
 | Usuario (abstrata) | Pessoa que acessa o sistema | nome, email, telefone |
-| Atleta | Aluno atendido pela Playmakerz | dataDeNascimento, objetivos |
-| Responsavel | Pai ou responsável de atleta menor de idade | parentesco |
+| Atleta | Aluno atendido pela Playmakerz | nome, dataDeNascimento, objetivos, email, telefone |
+| Responsavel | Pai ou responsável de atleta menor de idade | telefone |
+| DisponibilidadeProfissional | Dias e horários do profissional | diaSemana, horaInicio, horaFim |
 | Profissional | Treinador ou profissional que conduz os atendimentos | especialidade |
 | Funcionario | Recepção, coordenação, gestão ou manutenção | cargo |
 | Espaco | Local de treino | nome, tipo, capacidade |
 | Equipamento | Equipamento que pode ser reservado | nome, tipo |
-| Agendamento | Atendimento com atletas, profissional, espaço e equipamentos | data, horarioDeInicio, horarioDeTermino, tipo, situacao |
-| Recorrencia | Regra de repetição de agendamentos | frequencia, dataDeTermino |
-| Presenca | Presença ou falta do atleta em um agendamento | situacao |
-| Notificacao | Confirmação, lembrete ou aviso enviado a um usuário | tipo, mensagem, dataDeEnvio |
+| Agendamento | Atendimento com atletas, profissional, espaço e equipamentos | inicio, fim, modalidade, limiteParticipantes, situacao, observacoes, motivoCancelamento |
+| ParticipacaoAgendamento | Inscrição e situação individual do atleta em um agendamento | tipo, situacao, observacoes, motivoCancelamento |
 
 #### 1.4 Rastreabilidade
 
@@ -51,14 +50,13 @@ Os requisitos (RF) estão no [Levantamento de Requisitos](levreq.md) e os casos 
 | Usuario | RF01, RF02, RF15 | Autenticar usuário; Gerenciar usuários e perfis de permissão | Tela 1 |
 | Atleta | RF02, RF04 | Gerenciar atletas; Criar agendamento individual; Consultar agenda | Tela 1, Tela 2 |
 | Responsavel | RF02, RF04 | Gerenciar atletas; Consultar agenda | Tela 1 |
-| Profissional | RF02, RF08 | Gerenciar profissionais; Registrar presença e falta; Consultar agenda | Tela 2 |
+| Profissional | RF02, RF08 | Gerenciar profissionais; Consultar agenda | Tela 2 |
+| DisponibilidadeProfissional | RF08 | Consultar horários disponíveis dos profissionais | Tela 2 |
 | Funcionario | RF02, RF03 | Gerenciar usuários e perfis de permissão; Criar agendamento individual | Tela 1 |
 | Espaco | RF06, RF10, RF14 | Gerenciar espaços; Consultar ocupação dos espaços | Tela 2 |
 | Equipamento | RF06, RF10 | Gerenciar equipamentos; Bloquear espaço ou equipamento para manutenção | Tela 2 |
-| Agendamento | RF09, RF10, RF12, RF17 | Criar agendamento (individual, em grupo e recorrente); Remarcar agendamento; Cancelar agendamento | Tela 2 |
-| Recorrencia | RF11 | Criar agendamento recorrente | Tela 2 |
-| Presenca | RF12 | Registrar presença e falta | Tela 2 |
-| Notificacao | RF13 | Enviar lembretes e avisos | não prototipado |
+| Agendamento | RF09, RF10, RF17 | Criar agendamento (individual e em grupo); Remarcar agendamento; Cancelar agendamento | Tela 2 |
+| ParticipacaoAgendamento | RF12 | Registrar presença e falta; Cancelar participação individual | Tela 2 |
 
 #### 1.5 Critérios de validação
 
@@ -119,6 +117,7 @@ Refinar o modelo conceitual para uma estrutura orientada à implementação.
 | Versão | Data       | Autor(es)                | Revisor(es) | Resumo da alteração                       |
 | ------ | ---------- | ------------------------ | ----------- | ----------------------------------------- |
 | v0.1   | 29/09/2026 | Maria Eduarda Alves Cruz | pendente    | Criação do Diagrama de Classes Conceitual |
+| v0.2 | 10/11/2026   | Marcus Vinicius          | pendente | Atualização das classes e da rastreabilidade |
 
 ### 5) Entregáveis
 

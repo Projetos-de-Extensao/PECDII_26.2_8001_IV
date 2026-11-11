@@ -8,8 +8,8 @@
     }
 
     {
-        <&calendar> Dia: | "dd/mm/aaaa"
-        <&person> Profissional: | "Carlos Mendes     "
+        <&calendar> Dia:         | "dd/mm/aaaa"
+        <&person> Profissional:  | ^Todos^
     }
 
     {
@@ -20,40 +20,76 @@
 
     {
         <b>Lista de agendamentos
+        [+ Novo agendamento]
     }
 
     {
-        Dia: 15/09/2026
-        Horário: 08:00 - 09:00
-        Profissional: Carlos Mendes
+        Dia:            16/11/2026
+        Horario:        09:00 - 09:30
+        Profissional:   Ana
+        Espaco:         Sala de treinamento
+        Modalidade:     Individual
+        Participantes:  1
+        Situacao:       Agendado
         [Ver detalhes]
     }
 
     --
 
     {
-        Dia: 15/09/2026
-        Horário: 09:00 - 10:00
-        Profissional: Carlos Mendes
+        Dia:            16/11/2026
+        Horario:        10:00 - 10:30
+        Profissional:   Ana
+        Espaco:         Sala de treinamento
+        Modalidade:     Em grupo
+        Participantes:  2/4
+        Situacao:       Agendado
         [Ver detalhes]
     }
 
     --
 
     {
-        Dia: 16/09/2026
-        Horário: 14:00 - 15:00
-        Profissional: Carlos Mendes
-        [Ver detalhes]
+        <b>Novo agendamento
     }
 
-    --
+    {
+        <b>1. Escolha o horario
+    }
 
     {
-        Dia: 16/09/2026
-        Horário: 16:00 - 17:00
-        Profissional: Carlos Mendes
-        [Ver detalhes]
+        Profissional:   | ^Selecionar^
+        Data:           | "dd/mm/aaaa"
+        Horario:        | ^09:00 - 09:30^
+    }
+
+    {
+        <b>2. Selecione o atleta
+    }
+
+    {
+        Atletas:        | ^Selecionar^
+        Registrado por: | ^Funcionario^
+    }
+
+    {
+        [Aula experimental]
+    }
+
+    {
+        <b>3. Configure a atividade
+    }
+
+    {
+        Modalidade:             | ^Individual^
+        Limite de participantes:| "1"
+        Espaco:                 | ^Selecionar^
+        Equipamentos:           | ^Selecionar^
+        Observacoes:            | "                  "
+    }
+
+    {
+        [Criar agendamento] | [Voltar]
     }
 }
 
