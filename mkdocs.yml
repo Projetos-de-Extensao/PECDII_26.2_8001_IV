@@ -25,6 +25,7 @@ nav:
       - Github Workflows: Construcao/github_workflows.md
       - GitHub Projects: Construcao/github_projects.md
       - CodeSpace: Construcao/codespace.md
+      - API: Construcao/api.md
   - Transição:
       - Index: Transicao/index.md
 
