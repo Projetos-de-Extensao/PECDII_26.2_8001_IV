@@ -222,7 +222,12 @@ O serviço impede inscrição duplicada, conflito do atleta e entrada depois que
 
 ## 7. Contrato recomendado para a API
 
-Esta seção é uma proposta de contrato. Os endpoints ainda precisam ser implementados e alinhados entre as equipes.
+Esta seção foi escrita antes da API ficar pronta. A versão final está na página [API REST](../Construcao/api.md). Os exemplos abaixo diferem da API real em quatro pontos:
+
+- os campos se chamam `profissional`, `espaco`, `atletas` e `equipamentos`, sem `_id` nem `_ids`;
+- o `registrado_por` vai no corpo da requisição; 
+- o erro 400 vem direto por campo (`{"profissional": [...]}`), sem o objeto `errors`;
+- as datas são aceitas sem fuso (`2026-11-16T14:00`) e, nesse caso, valem como UTC.
 
 ### 7.1 Criar agendamento
 
@@ -341,18 +346,18 @@ GET /api/agendamentos/?inicio=2026-10-26T00:00:00-03:00&fim=2026-10-27T00:00:00-
 GET /api/agendamentos/91/
 ```
 
-Esses endpoints ainda não existem. Os nomes e formatos finais devem ser acordados antes da implementação.
+O que já existe: atletas, profissionais (com `/horarios/`), espaços e equipamentos, mas sem os filtros `?ativo=` e `?search=`. O que não existe: `/profissionais/{id}/disponibilidades/` e `GET /api/agendamentos/` (listagem e consulta).
 
 ### 7.4 Operações futuras
 
-Não assumir que estes endpoints já existem:
+O cancelamento já existe, a remarcação não:
 
 ```http
 POST /api/agendamentos/91/cancelar/
 POST /api/agendamentos/91/remarcar/
 ```
 
-Os serviços de cancelamento já existem no backend, mas ainda precisam ser expostos por um endpoint autenticado. A remarcação ainda precisa de um serviço próprio. O front-end não deve alterar `situacao`, `inicio` ou `fim` diretamente.
+Os serviços de cancelamento já existem no backend, e já estão expostos por um endpoint autenticado. A remarcação ainda precisa de um serviço próprio. O front-end não deve alterar `situacao`, `inicio` ou `fim` diretamente.
 
 ## 8. Fluxo recomendado da tela
 
