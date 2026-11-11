@@ -1,19 +1,26 @@
 from datetime import date, datetime, time, timedelta
 
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 # Models necessários para criar e consultar os dados dos testes.
-from agendamentos.models import Agendamento, ParticipacaoAgendamento
-from agendamentos.models import Espaco
+from agendamentos.models import (
+    Agendamento,
+    Equipamento,
+    Espaco,
+    ParticipacaoAgendamento,
+)
 from usuarios.models import (
     Atleta,
     DisponibilidadeProfissional,
     Funcionario,
     Profissional,
+    Responsavel,
     Usuario,
 )
 
@@ -710,7 +717,6 @@ class AgendamentoAPITests(APITestCase):
             atleta=self.atleta,
         )
         self.assertEqual(participacao.situacao, "confirmada")
-
 
 
 # ======================================================================
