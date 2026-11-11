@@ -5,6 +5,7 @@
 ### Login
 
 ```plantuml
+
 @startsalt
 
 {+
@@ -15,32 +16,31 @@
     }
 
     {
-        @ E-mail: | "exemplo@gmail.com           "
+        <&person> Usuário: | "seu_usuario                 "
         <&key> Senha: | "********                    "
     }
 
     {
         [<&account-login> Entrar]
-        [Esqueci minha senha]
     }
 
     ..
 
     {
-        Ainda não possui uma conta?
-        [<&person> Criar conta]
-    }
-
-    --
-
-    {
-        Login com: | [Google]
+        Acesso para usuários cadastrados
+        Contas gerenciadas pela administração
     }
 }
 
 @endsalt
+
 ```
-Observação: cada usuário deverá ter acesso somente às informações necessárias para sua função, visando proteger dados pessoais e sensíveis.
+
+Observação: o acesso ao sistema é realizado por meio de nome
+de usuário e senha. Cada usuário deverá ter acesso somente
+às funcionalidades permitidas ao seu perfil, visando proteger
+dados pessoais e sensíveis. A interface própria de login
+representada no protótipo ainda não foi implementada.
 
 ### Cadastro
 ```plantuml
@@ -54,9 +54,11 @@ Observação: cada usuário deverá ter acesso somente às informações necess�
     }
 
     {
-        <&person> Nome: | "                         "
+        <&person> Nome completo: | "                         "
+        <&person> Nome de usuário: | "                         "
         @ E-mail: | "exemplo@gmail.com        "
         <&phone> Telefone: | "(00) 00000-0000          "
+        <&calendar> Data de nascimento: | "dd/mm/aaaa          "
         <&key> Senha: | "********                 "
         <&key> Confirmar senha: | "********                 "
         Tipo de usuário: | ^Atleta^
@@ -72,10 +74,19 @@ Observação: cada usuário deverá ter acesso somente às informações necess�
 }
 
 @endsalt
-```
-Observação: para atletas menores de idade, deverá ser considerada a associação da conta a um pai ou responsável.
 
-Observação: o cadastro e as permissões de determinados perfis, principalmente funcionários e profissionais, poderão depender de autorização da administração.
+```
+
+Observação: o cadastro contempla nome completo, nome de usuário,
+e-mail, telefone, senha, confirmação de senha e tipo de usuário.
+A data de nascimento deverá ser informada quando aplicável.
+
+Observação: atletas menores de idade deverão estar associados
+a um responsável para realizar agendamentos.
+
+Observação: o cadastro de funcionários e profissionais poderá
+depender de autorização administrativa. A seleção de um perfil
+não deverá conceder automaticamente permissões privilegiadas.
 
 ---
 
@@ -91,8 +102,8 @@ Observação: o cadastro e as permissões de determinados perfis, principalmente
     }
 
     {
-        <&calendar> Dia: | "dd/mm/aaaa"
-        <&person> Profissional: | "Carlos Mendes     "
+        <&calendar> Dia:         | "dd/mm/aaaa"
+        <&person> Profissional:  | ^Todos^
     }
 
     {
@@ -103,66 +114,132 @@ Observação: o cadastro e as permissões de determinados perfis, principalmente
 
     {
         <b>Lista de agendamentos
+        [+ Novo agendamento]
     }
 
     {
-        Dia: 15/09/2026
-        Horário: 08:00 - 09:00
-        Profissional: Carlos Mendes
+        Dia:            16/11/2026
+        Horario:        09:00 - 09:30
+        Profissional:   Ana
+        Espaco:         Sala de treinamento
+        Modalidade:     Individual
+        Participantes:  1
+        Situacao:       Agendado
         [Ver detalhes]
     }
 
     --
 
     {
-        Dia: 15/09/2026
-        Horário: 09:00 - 10:00
-        Profissional: Carlos Mendes
+        Dia:            16/11/2026
+        Horario:        10:00 - 10:30
+        Profissional:   Ana
+        Espaco:         Sala de treinamento
+        Modalidade:     Em grupo
+        Participantes:  2/4
+        Situacao:       Agendado
         [Ver detalhes]
     }
 
     --
 
     {
-        Dia: 16/09/2026
-        Horário: 14:00 - 15:00
-        Profissional: Carlos Mendes
-        [Ver detalhes]
+        <b>Novo agendamento
     }
 
-    --
+    {
+        <b>1. Escolha o horario
+    }
 
     {
-        Dia: 16/09/2026
-        Horário: 16:00 - 17:00
-        Profissional: Carlos Mendes
-        [Ver detalhes]
+        Profissional:   | ^Selecionar^
+        Data:           | "dd/mm/aaaa"
+        Horario:        | ^09:00 - 09:30^
+    }
+
+    {
+        <b>2. Selecione o atleta
+    }
+
+    {
+        Atletas:        | ^Selecionar^
+        Registrado por: | ^Funcionario^
+    }
+
+    {
+        [Aula experimental]
+    }
+
+    {
+        <b>3. Configure a atividade
+    }
+
+    {
+        Modalidade:             | ^Individual^
+        Limite de participantes:| "1"
+        Espaco:                 | ^Selecionar^
+        Equipamentos:           | ^Selecionar^
+        Observacoes:            | "                  "
+    }
+
+    {
+        [Criar agendamento] | [Voltar]
     }
 }
 
 @endsalt
+
+@endsalt
 ```
+
+### Consulta e Criação de Agendamentos
+
+A tela permite consultar os agendamentos cadastrados, exibindo
+data, horário, profissional, espaço, modalidade, participantes
+e situação, além da opção de visualizar detalhes.
+
+Para criar um agendamento, deverão ser informados o profissional,
+a data, o horário, os atletas participantes, o funcionário
+responsável pelo registro, a modalidade, o limite de participantes,
+o espaço, os equipamentos e eventuais observações.
+
+O sistema permite agendamentos individuais e em grupo, incluindo
+a inscrição de novos atletas em atividades com vagas disponíveis.
+
 ### Verificação do Agendamento
 
-Antes da confirmação, o sistema deverá verificar se os elementos envolvidos no atendimento estão disponíveis durante o período selecionado.
+Antes da confirmação, o sistema deverá verificar:
 
-Verificação: disponibilidade do atleta  
-Verificação: disponibilidade do profissional  
-Verificação: disponibilidade do espaço  
-Verificação: disponibilidade dos equipamentos selecionados  
-Verificação: existência de bloqueios por manutenção  
-Mensagem: informar quando o agendamento estiver disponível  
-Mensagem de conflito: informar quando algum atleta, profissional, espaço ou equipamento já estiver associado a outro agendamento no mesmo período ou estiver indisponível  
+- Disponibilidade do profissional no horário selecionado;
+- Conflitos de horário envolvendo atletas e profissionais;
+- Disponibilidade e capacidade do espaço;
+- Disponibilidade dos equipamentos selecionados;
+- Limite de participantes da atividade;
+- Dados necessários para o agendamento dos atletas.
+- Vínculo com responsável para atletas menores de 18 anos;
 
-Botão: Confirmar agendamento
+Os horários são disponibilizados em intervalos de 30 minutos.
 
-Observação: o sistema deverá impedir reservas duplicadas ou com conflito de horário.
+Agendamentos individuais permitem um participante. Atividades
+em grupo possuem limite mínimo de dois participantes,
+respeitando a capacidade do espaço.
 
-Observação: após a confirmação, o agendamento deverá ficar disponível para consulta pelos usuários autorizados de acordo com seus respectivos perfis.
+O sistema permite inscrever atletas em atividades de grupo
+existentes, desde que haja vagas disponíveis.
 
-Observação: atletas e responsáveis deverão visualizar apenas os agendamentos relacionados a eles, enquanto profissionais deverão consultar sua própria agenda. Perfis administrativos poderão possuir acesso mais amplo conforme suas permissões.
+A opção de aula experimental permite o cadastro rápido de
+interessados maiores de idade, mediante registro por um
+recepcionista.
 
-Observação: o sistema deverá permitir posteriormente o acompanhamento do status do atendimento, incluindo presença, falta ou cancelamento, conforme previsto no escopo do projeto.
+O sistema também permite cancelar agendamentos inteiros ou
+participações individuais, registrando o motivo do cancelamento.
+
+Quando a última participação ativa de uma atividade em grupo
+é cancelada, o agendamento também é cancelado automaticamente.
+
+Observação: os filtros por data e profissional representados
+no protótipo ainda não estão implementados na página de
+listagem atual.
 
 ## Referências
 
@@ -176,5 +253,6 @@ Observação: o sistema deverá permitir posteriormente o acompanhamento do stat
 
 | Data     | Versão | Descrição                            | Autor(es)                                                                            |
 | -------- | ------- | -------------------------------------- | ------------------------------------------------------------------------------------ |
-|01/09/26|1.0| Criação do documento|Marcos Martins|
+|01/09/26|1.0| Criação do documento |Marcus Vinicius|
+|10/11/26|2.0| Atualização conforme o sistema atual | Marcus Vinicius |
 
