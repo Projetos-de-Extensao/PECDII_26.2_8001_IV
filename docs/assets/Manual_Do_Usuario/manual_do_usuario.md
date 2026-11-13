@@ -1,3 +1,4 @@
+
 ---
 id: manual_do_usuario
 title: Manual do Usuário
@@ -5,15 +6,13 @@ title: Manual do Usuário
 
 # Manual do Usuário — Playmakerz
 
-**Versão:** 0.1 (preliminar)  
+**Versão:** 0.2
 **Data:** 13/11/2026  
 **Público:** funcionários e administradores da interface interna.
 
-> Documento em revisão. Os procedimentos foram preparados a partir do código atual do projeto; as capturas de tela e os resultados serão conferidos durante os exercícios práticos.
-
 ## 1. Apresentação
 
-O Playmakerz é um sistema de gestão de atendimentos esportivos. Na versão atual, permite consultar e criar agendamentos individuais ou em grupo, inscrever atletas em turmas, registrar aulas experimentais e realizar cancelamentos.
+O Playmakerz é um sistema de gestão de atendimentos esportivos. Na versão atual, permite cadastrar usuários, consultar e criar agendamentos individuais ou em grupo, inscrever atletas em turmas, registrar aulas experimentais e realizar cancelamentos.
 
 O sistema possui duas áreas principais:
 
@@ -24,15 +23,15 @@ A **API REST** também está disponível para integrações, mas não constitui 
 
 ## 2. Acesso ao sistema
 
-1. Com o servidor em execução, acesse `http://127.0.0.1:8000/`.
+1. Com o servidor em execução, acesse `http://127.0.0.1:8000/`. (Host Local)
 2. Caso seja solicitado, faça login com uma conta autorizada no Django.
-3. Acesse a **Agenda** ou a área **Admin**, de acordo com a operação desejada.
+3. Acesse a **Agenda**, em `http://127.0.0.1:8000/agendamentos/`, ou a área **Admin**, em `http://127.0.0.1:8000/admin/`, de acordo com a operação desejada.
 
-A página inicial redireciona para `/agendamentos/`. A interface da Agenda exige uma conta autenticada com status **staff**. O projeto ainda não possui uma tela pública própria de login ou cadastro.
+A página inicial redireciona para `agendamentos/`. A interface da Agenda exige uma conta autenticada com status **staff**.
 
-**[Inserir captura: tela de login do Django Admin]**
+**![Tela de Login do Djando Admin](./Imagens/tela_login.png)**
 
-### 2.1 Menu de navegação
+### 2.1 Menu de navegação em `agendamentos/`
 
 | Opção | Finalidade |
 |---|---|
@@ -40,13 +39,13 @@ A página inicial redireciona para `/agendamentos/`. A interface da Agenda exige
 | **Novo agendamento** | Criar uma atividade ou inscrever alguém em uma turma existente. |
 | **Admin** | Acessar os cadastros administrativos. |
 
-Endereços no ambiente local: `/admin/`, `/agendamentos/` e `/agendamentos/novo/`.
+Endereços no ambiente local: `admin/`, `agendamentos/` e `agendamentos/novo/`.
 
-**[Inserir captura: cabeçalho da interface e menu de navegação]**
+**![Cabeçalho da página agendamentos](./Imagens/header_agendamentos.png)**
 
 ## 3. Preparar os cadastros no Admin
 
-Antes de criar agendamentos, normalmente é necessário cadastrar um **profissional**, sua **disponibilidade**, um **funcionário responsável**, um **atleta** e um **espaço**. Equipamentos são opcionais.
+Antes de criar agendamentos, é necessário cadastrar um **profissional**, sua **disponibilidade**, um **funcionário**, um **atleta** e um **espaço**. Equipamentos são opcionais.
 
 Os modelos exibidos no Admin dependem das permissões da conta. Em um ambiente de teste, utilize uma conta administrativa autorizada.
 
@@ -70,16 +69,15 @@ Criar um **User** não cria automaticamente os perfis **Usuario**, **Funcionario
 3. Em **Profissionais**, adicione um registro e selecione o perfil.
 4. Preencha a especialidade e mantenha o profissional ativo.
 5. Na seção de **horários disponíveis**, escolha os dias e períodos de atendimento.
-6. Salve.
 
 As faixas permitidas são **07:00–12:00** e **13:00–20:00**, com início e fim alinhados a intervalos de 30 minutos.
 
-**[Inserir captura: formulário do profissional e disponibilidade]**
+**![Formulário do profissional e disponibilidade](./Imagens/formulario_profisional.png)**
 
 ### 3.3 Cadastrar um funcionário
 
-1. Cadastre a conta em **Users**, quando necessário.
-2. Vincule essa conta a um registro em **Usuarios**.
+1. No Admin, crie uma conta em **Users** (se ainda não existir).
+2. Em **Usuarios**, crie um perfil vinculado a essa conta.
 3. Em **Funcionarios**, crie o perfil, informe o cargo e salve.
 
 O funcionário é escolhido no campo **Registrado por** durante um agendamento. Para aulas experimentais com cadastro rápido, deve ser selecionado um funcionário de cargo **Recepcionista**.
@@ -95,7 +93,7 @@ Um atleta **não precisa ter usuário e senha** para ser cadastrado. Entretanto,
 
 Para cadastrar um responsável, crie primeiro a conta em **Users**, depois seu perfil em **Usuarios** e, por fim, o registro em **Responsaveis**. No cadastro do atleta, selecione o responsável.
 
-Cada atleta pode ter no máximo um responsável diretamente vinculado na implementação atual.
+Cada atleta pode ter no máximo um responsável diretamente vinculado.
 
 ### 3.5 Cadastrar espaço e equipamento
 
@@ -106,11 +104,12 @@ Cada atleta pode ter no máximo um responsável diretamente vinculado na impleme
 
 A capacidade do espaço é usada para conferir a soma das vagas reservadas nos agendamentos simultâneos.
 
-**[Inserir captura: página inicial do Admin com os modelos disponíveis]**
+**![Página inicial do Admin com os modelos disponíveis](./Imagens/home_admin.png)**
+
 
 ## 4. Consultar os agendamentos
 
-1. Acesse a opção **Agenda**.
+1. Acesse a opção **Agenda** ou acesse **`http://127.0.0.1:8000/agendamentos/`**.
 2. Observe a tabela com os agendamentos cadastrados.
 3. Clique em **Ver detalhes** para abrir um registro.
 
@@ -120,7 +119,7 @@ Em atividades em grupo, a ocupação é exibida no formato **inscritos:limite**.
 
 Se não houver registros, será exibida uma mensagem indicando que a agenda está vazia.
 
-**[Inserir captura: lista de agendamentos]**
+**![Lista de agendamentos](./Imagens/lista_agendamentos.png)**
 
 ## 5. Criar um agendamento individual
 
@@ -136,7 +135,7 @@ Se não houver registros, será exibida uma mensagem indicando que a agenda est�
 
 A seleção de horários utiliza blocos de **30 minutos**. Atendimentos individuais têm limite de **um participante**.
 
-**[Inserir captura: etapas do formulário de agendamento]**
+**![Etapas do formulário de agendamento](./Imagens/novo_agendamento.png)**
 
 ## 6. Criar um agendamento em grupo
 
@@ -146,6 +145,7 @@ A seleção de horários utiliza blocos de **30 minutos**. Atendimentos individu
 4. Defina um **limite de participantes de pelo menos 2**, respeitando a capacidade do espaço.
 5. Selecione espaço e, opcionalmente, equipamentos e observações.
 6. Clique em **Criar agendamento**.
+7. Confira a mensagem de sucesso e os dados na página de detalhes.
 
 Uma atividade em grupo pode começar com apenas um atleta inscrito, desde que o limite da atividade seja de pelo menos duas vagas.
 
@@ -177,7 +177,7 @@ Para menores de 18 anos, o atleta e seu responsável precisam ser cadastrados an
 
 O sistema permite apenas **uma aula experimental não cancelada por atleta**. O cancelamento de uma participação experimental pode liberar nova tentativa, conforme as validações.
 
-**[Inserir captura: opção Aula Experimental ativada]**
+**![Aula experimental selecionada](./Imagens/campo_aula_experimental.png)**
 
 ## 8. Visualizar detalhes e cancelar
 
