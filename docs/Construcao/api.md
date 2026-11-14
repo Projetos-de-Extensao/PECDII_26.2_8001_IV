@@ -7,7 +7,7 @@ title: API REST
 
 A API é a parte do sistema que deixa outros programas, como um site, buscar e enviar informações para o sistema da Playmakerz. Ela funciona pela internet, usando o HTTP, e troca os dados no formato JSON.
 
-A API não cria regras novas. As regras do sistema já estão nos models e nos services que o grupo fez, então ela só recebe o pedido, chama esse código e devolve a resposta. Com ela dá para cadastrar espaços, equipamentos e atletas, ver os profissionais e os horários livres deles, e criar ou cancelar agendamentos.
+A API não cria regras novas. As regras do sistema já estão nos models e nos services que o grupo fez, então ela só recebe o pedido, chama esse código e devolve a resposta. Com ela dá para cadastrar espaços, equipamentos e atletas, ver os profissionais e os horários livres deles, além de criar, listar, detalhar e cancelar agendamentos.
 
 ## 2 Como acessar
 
@@ -91,9 +91,11 @@ Abaixo estão todas as rotas da API. Nas rotas com `{id}`, troque `{id}` pelo n�
 | Equipamentos | GET, PUT, PATCH, DELETE | `/api/equipamentos/{id}/` | Consulta, edita e apaga um equipamento |
 | Atletas | GET, POST | `/api/atletas/` | Lista e cadastra atletas |
 | Atletas | GET, PUT, PATCH, DELETE | `/api/atletas/{id}/` | Consulta, edita e apaga um atleta |
-| Profissionais | GET | `/api/profissionais/` | Lista os profissionais ativos |
+| Profissionais | GET | `/api/profissionais/` | Lista os profissionais ativos | 
 | Profissionais | GET | `/api/profissionais/{id}/` | Consulta um profissional |
 | Profissionais | GET | `/api/profissionais/{id}/horarios/?data=AAAA-MM-DD` | Lista os horários livres e ocupados do dia |
+| Agendamentos | GET | `/api/agendamentos/` | Lista os agendamentos com as informações necessárias para a Agenda |
+| Agendamentos | GET | `/api/agendamentos/{id}/` | Consulta os detalhes completos de um agendamento, incluindo seus participantes e equipamentos |
 | Agendamentos | POST | `/api/agendamentos/` | Cria um agendamento |
 | Agendamentos | POST | `/api/agendamentos/{id}/cancelar/` | Cancela um agendamento |
 | Agendamentos | POST | `/api/agendamentos/{id}/inscrever/` | Inscreve um atleta em uma atividade em grupo |
@@ -350,6 +352,116 @@ Resposta (código 200):
     "atualizado_em": "2026-11-11T02:17:08.861928Z"
 }
 ```
+
+### 5.10 Listar agendamentos
+
+Retorna todos os agendamentos cadastrados, ordenados do mais
+recente para o mais antigo.
+
+```bash
+curl -H "Authorization: Token SEU_TOKEN" \
+  http://localhost:8000/api/agendamentos/
+```
+
+Resposta (código 200, exemplo com um agendamento):
+
+```json
+[
+    {
+        "id": 1,
+        "inicio": "2026-11-12T09:00:00Z",
+        "fim": "2026-11-12T09:30:00Z",
+        "profissional": 1,
+        "profissional_descricao": "Joana Souza - Treinamento Funcional",
+        "espaco": 2,
+        "espaco_descricao": "Sala Funcional - Treinamento",
+        "modalidade": "individual",
+        "modalidade_descricao": "Individual",
+        "limite_participantes": 1,
+        "atletas": [1],
+        "atletas_nomes": ["Lucas Andrade"],
+        "inscritos_ativos": 1,
+        "situacao": "realizado",
+        "situacao_descricao": "Realizado"
+    }
+]
+```
+
+O campo `inscritos_ativos` desconsidera participações
+canceladas. Os campos de descrição fornecem textos legíveis
+para a interface, enquanto os IDs permitem identificar
+os registros relacionados.
+
+Se não houver agendamentos, a resposta será uma lista
+vazia (`[]`), com HTTP 200.
+
+### 5.11 Detalhar um agendamento
+
+Retorna as informações completas de um agendamento, incluindo
+profissional, espaço, funcionário responsável, equipamentos
+e participações individuais.
+
+```bash
+curl -H "Authorization: Token SEU_TOKEN" \
+  http://localhost:8000/api/agendamentos/1/
+```
+
+Resposta (código 200):
+
+```json
+{
+    "id": 1,
+    "inicio": "2026-11-12T09:00:00Z",
+    "fim": "2026-11-12T09:30:00Z",
+    "modalidade": "individual",
+    "situacao": "realizado",
+    "limite_participantes": 1,
+    "inscritos_ativos": 1,
+    "profissional": {
+        "id": 1,
+        "nome": "Joana Souza",
+        "especialidade": "Treinamento Funcional"
+    },
+    "espaco": {
+        "id": 2,
+        "nome": "Sala Funcional",
+        "tipo": "Treinamento"
+    },
+    "registrado_por": {
+        "id": 1,
+        "nome": "Camila Ferreira",
+        "cargo": "Recepcionista"
+    },
+    "equipamentos": [
+        {
+            "id": 2,
+            "nome": "Colchonetes",
+            "tipo": "Acessório"
+        }
+    ],
+    "participacoes": [
+        {
+            "id": 1,
+            "atleta": {
+                "id": 1,
+                "nome": "Lucas Andrade"
+            },
+            "tipo": "regular",
+            "situacao": "presente",
+            "observacoes": "Participou normalmente",
+            "motivo_cancelamento": "",
+            "registrado_por": {
+                "id": 1,
+                "nome": "Camila Ferreira",
+                "cargo": "Recepcionista"
+            }
+        }
+    ],
+    "observacoes": "Avaliação física inicial",
+    "motivo_cancelamento": ""
+}
+```
+
 
 ## 6 Códigos de resposta
 
