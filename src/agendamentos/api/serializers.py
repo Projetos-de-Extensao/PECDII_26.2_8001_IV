@@ -95,6 +95,44 @@ class ParticipacaoAgendamentoSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+
+# Serializa os dados de cada participação para a tela de detalhes.
+class ParticipacaoDetalheSerializer(ParticipacaoAgendamentoSerializer):
+
+    # Acrescenta o nome do atleta, mantendo seu ID original.
+    atleta_nome = serializers.CharField(
+        source="atleta.nome",
+        read_only=True,
+    )
+
+    # Retorna a descrição legível do tipo de participação.
+    tipo_descricao = serializers.CharField(
+        source="get_tipo_display",
+        read_only=True,
+    )
+
+    # Retorna a descrição legível da situação da participação.
+    situacao_descricao = serializers.CharField(
+        source="get_situacao_display",
+        read_only=True,
+    )
+
+    # Retorna a descrição do funcionário que registrou a participação.
+    registrado_por_descricao = serializers.StringRelatedField(
+        source="registrado_por",
+        read_only=True,
+    )
+
+    class Meta(ParticipacaoAgendamentoSerializer.Meta):
+        # Herda os campos existentes e acrescenta os campos de detalhes.
+        fields = ParticipacaoAgendamentoSerializer.Meta.fields + [
+            "atleta_nome",
+            "tipo_descricao",
+            "situacao_descricao",
+            "registrado_por_descricao",
+        ]
+        read_only_fields = fields
+
 class CriarAgendamentoSerializer(serializers.Serializer):
     profissional = serializers.PrimaryKeyRelatedField(
         queryset=Profissional.objects.all()
@@ -234,6 +272,74 @@ class AgendamentoListaSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = fields
 
+
+# Serializa as informações completas da tela de detalhes.
+class AgendamentoDetalheSerializer(AgendamentoSerializer):
+
+    # Acrescenta as descrições dos relacionamentos.
+    profissional_descricao = serializers.StringRelatedField(
+        source="profissional",
+        read_only=True,
+    )
+
+    espaco_descricao = serializers.StringRelatedField(
+        source="espaco",
+        read_only=True,
+    )
+
+    registrado_por_descricao = serializers.StringRelatedField(
+        source="registrado_por",
+        read_only=True,
+    )
+
+    # Acrescenta as descrições da modalidade e da situação.
+    modalidade_descricao = serializers.CharField(
+        source="get_modalidade_display",
+        read_only=True,
+    )
+
+    situacao_descricao = serializers.CharField(
+        source="get_situacao_display",
+        read_only=True,
+    )
+
+    # Retorna os equipamentos com ID, nome e tipo.
+    equipamentos_detalhes = EquipamentoSerializer(
+        source="equipamentos",
+        many=True,
+        read_only=True,
+    )
+
+    # Retorna os dados individuais de todas as participações.
+    participacoes = ParticipacaoDetalheSerializer(
+        many=True,
+        read_only=True,
+    )
+
+    # Calcula a quantidade de inscritos ativos.
+    inscritos_ativos = serializers.SerializerMethodField()
+
+    def get_inscritos_ativos(self, agendamento):
+        # Conta as participações que não foram canceladas.
+        return sum(
+            1
+            for participacao in agendamento.participacoes.all()
+            if participacao.situacao != "cancelada"
+        )
+
+    class Meta(AgendamentoSerializer.Meta):
+        # Mantém os campos originais e acrescenta os detalhes da tela.
+        fields = AgendamentoSerializer.Meta.fields + [
+            "profissional_descricao",
+            "espaco_descricao",
+            "registrado_por_descricao",
+            "modalidade_descricao",
+            "situacao_descricao",
+            "equipamentos_detalhes",
+            "participacoes",
+            "inscritos_ativos",
+        ]
+        read_only_fields = fields
 
 class ProfissionalSerializer(serializers.ModelSerializer):
     nome = serializers.SerializerMethodField()
