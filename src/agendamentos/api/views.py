@@ -27,6 +27,8 @@ from .serializers import CriarAgendamentoSerializer
 from .serializers import CancelamentoSerializer
 from .serializers import InscricaoAgendamentoSerializer
 from .serializers import ParticipacaoAgendamentoSerializer
+from .serializers import AgendamentoListaSerializer
+from .serializers import AgendamentoDetalheSerializer
 
 
 class EspacoViewSet(viewsets.ModelViewSet):
@@ -71,6 +73,55 @@ class ProfissionalViewSet(viewsets.ReadOnlyModelViewSet):
 
 class AgendamentoViewSet(viewsets.ViewSet):
     
+    def list(self, request):
+        # Consulta todos os agendamentos, do mais recente ao mais antigo.
+        agendamentos = (
+            Agendamento.objects.all()
+            .select_related(
+                "profissional__usuario__user",
+                "espaco",
+            )
+            .prefetch_related(
+                "participacoes__atleta",
+            )
+            .order_by("-inicio", "-id")
+        )
+
+        # Converte os agendamentos em dados para a página Agenda.
+        serializer = AgendamentoListaSerializer(agendamentos, many=True)
+
+        # Retorna a lista com HTTP 200.
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, pk=None):
+        # Prepara a consulta dos agendamentos e seus relacionamentos.
+        agendamentos = (
+            Agendamento.objects.all()
+            .select_related(
+                "profissional__usuario__user",
+                "espaco",
+                "registrado_por__usuario__user",
+            )
+            .prefetch_related(
+                "equipamentos",
+                "participacoes__atleta",
+                "participacoes__registrado_por__usuario__user",
+            )
+        )
+
+        # Busca o agendamento pelo ID recebido na URL.
+        # Retorna HTTP 404 se o registro não existir.
+        agendamento = get_object_or_404(agendamentos, pk=pk)
+
+        # Converte o agendamento para a representação detalhada.
+        serializer = AgendamentoDetalheSerializer(agendamento)
+
+        # Retorna os dados com HTTP 200 (OK).
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
+
     def create(self, request):
         # Recebe os dados da requisição e instancia o serializer de criação.
         # O serializer será responsável por validar e converter os dados recebidos.

@@ -718,6 +718,167 @@ class AgendamentoAPITests(APITestCase):
         )
         self.assertEqual(participacao.situacao, "confirmada")
 
+    def test_listar_agendamentos(self):
+        # Cria um agendamento utilizando o endpoint POST.
+        resposta_criacao = self.client.post(
+            reverse("agendamento-list"),
+            self.dados,
+            format="json",
+        )
+
+        # Confirma que o agendamento foi criado com sucesso.
+        self.assertEqual(
+            resposta_criacao.status_code,
+            status.HTTP_201_CREATED,
+            resposta_criacao.data,
+        )
+
+        # Faz uma requisição GET para consultar todos os agendamentos.
+        resposta = self.client.get(reverse("agendamento-list"))
+
+        # Verifica se a consulta retornou HTTP 200 (OK).
+        self.assertEqual(resposta.status_code, status.HTTP_200_OK)
+
+        # Confirma que a lista retornada contém exatamente um agendamento.
+        self.assertEqual(len(resposta.data), 1)
+
+        # Verifica se o ID retornado corresponde ao registro criado.
+        self.assertEqual(
+            resposta.data[0]["id"],
+            resposta_criacao.data["id"],
+        )
+
+    def test_detalhar_agendamento_com_objetos_relacionados(self):
+        # Cria um agendamento pelo endpoint POST existente.
+        criacao = self.client.post(
+            reverse("agendamento-list"),
+            self.dados,
+            format="json",
+        )
+
+        # Verifica se a criação foi realizada com sucesso.
+        self.assertEqual(
+            criacao.status_code,
+            status.HTTP_201_CREATED,
+            criacao.data,
+        )
+
+        agendamento_id = criacao.data["id"]
+
+        # Adiciona um equipamento para testar sua serialização.
+        equipamento = Equipamento.objects.create(
+            nome="Colchonete",
+            tipo="Acessório",
+        )
+
+        agendamento = Agendamento.objects.get(pk=agendamento_id)
+        agendamento.equipamentos.add(equipamento)
+
+        # Recupera a participação criada pelo POST.
+        participacao = ParticipacaoAgendamento.objects.get(
+            agendamento=agendamento,
+        )
+
+        # Consulta os detalhes do agendamento pelo ID.
+        resposta = self.client.get(
+            reverse("agendamento-detail", args=[agendamento_id])
+        )
+
+        self.assertEqual(
+            resposta.status_code,
+            status.HTTP_200_OK,
+            resposta.data,
+        )
+
+        dados = resposta.data
+
+        # Confirma o identificador do agendamento.
+        self.assertEqual(dados["id"], agendamento_id)
+
+        # Verifica o objeto do profissional.
+        self.assertEqual(
+            dados["profissional"]["id"],
+            self.profissional.id,
+        )
+        self.assertEqual(
+            dados["profissional"]["nome"],
+            str(self.profissional.usuario),
+        )
+        self.assertEqual(
+            dados["profissional"]["especialidade"],
+            self.profissional.especialidade,
+        )
+
+        # Verifica o objeto do espaço.
+        self.assertEqual(dados["espaco"]["id"], self.espaco.id)
+        self.assertEqual(dados["espaco"]["nome"], self.espaco.nome)
+        self.assertEqual(dados["espaco"]["tipo"], self.espaco.tipo)
+
+        # Verifica o funcionário responsável pelo agendamento.
+        self.assertEqual(
+            dados["registrado_por"]["id"],
+            self.funcionario.id,
+        )
+        self.assertEqual(
+            dados["registrado_por"]["cargo"],
+            self.funcionario.cargo,
+        )
+
+        # Verifica o equipamento associado.
+        self.assertEqual(len(dados["equipamentos"]), 1)
+        self.assertEqual(
+            dados["equipamentos"][0]["id"],
+            equipamento.id,
+        )
+        self.assertEqual(
+            dados["equipamentos"][0]["nome"],
+            equipamento.nome,
+        )
+
+        # Verifica a participação e seu identificador.
+        self.assertEqual(len(dados["participacoes"]), 1)
+
+        participacao_json = dados["participacoes"][0]
+
+        self.assertEqual(
+            participacao_json["id"],
+            participacao.id,
+        )
+
+        # Verifica o atleta aninhado na participação.
+        self.assertEqual(
+            participacao_json["atleta"]["id"],
+            self.atleta.id,
+        )
+        self.assertEqual(
+            participacao_json["atleta"]["nome"],
+            self.atleta.nome,
+        )
+
+        # Verifica a situação e a quantidade de inscritos.
+        self.assertEqual(
+            participacao_json["situacao"],
+            "confirmada",
+        )
+        self.assertEqual(dados["inscritos_ativos"], 1)
+
+        # Confirma que os campos redundantes foram removidos.
+        self.assertNotIn("profissional_descricao", dados)
+        self.assertNotIn("equipamentos_detalhes", dados)
+        self.assertNotIn("atletas", dados)
+
+    def test_detalhar_agendamento_inexistente(self):
+        # Faz uma requisição GET utilizando um ID inexistente.
+        resposta = self.client.get(
+            reverse("agendamento-detail", args=[999999])
+        )
+
+        # Verifica se a API retorna HTTP 404 (Not Found).
+        # O erro é produzido pelo get_object_or_404() do retrieve().
+        self.assertEqual(
+            resposta.status_code,
+            status.HTTP_404_NOT_FOUND,
+        )
 
 # ======================================================================
 # ATLETA
