@@ -156,6 +156,85 @@ class CancelamentoSerializer(serializers.Serializer):
         default="",
     )
 
+
+# Serializa os dados necessários para a página Agenda.
+class AgendamentoListaSerializer(serializers.ModelSerializer):
+
+    # Retorna a descrição do profissional, além do ID original.
+    profissional_descricao = serializers.StringRelatedField(
+        source="profissional",
+        read_only=True,
+    )
+
+    # Retorna a descrição do espaço, além do ID original.
+    espaco_descricao = serializers.StringRelatedField(
+        source="espaco",
+        read_only=True,
+    )
+
+    # Retorna os textos exibidos na interface.
+    modalidade_descricao = serializers.CharField(
+        source="get_modalidade_display",
+        read_only=True,
+    )
+    situacao_descricao = serializers.CharField(
+        source="get_situacao_display",
+        read_only=True,
+    )
+
+    # Campos calculados a partir das participações do agendamento.
+    atletas = serializers.SerializerMethodField()
+    atletas_nomes = serializers.SerializerMethodField()
+    inscritos_ativos = serializers.SerializerMethodField()
+
+    def _participacoes_ativas(self, agendamento):
+        # Considera todas as participações, exceto as canceladas.
+        return [
+            participacao
+            for participacao in agendamento.participacoes.all()
+            if participacao.situacao != "cancelada"
+        ]
+
+    def get_atletas(self, agendamento):
+        # Retorna os IDs dos atletas não cancelados.
+        return [
+            participacao.atleta_id
+            for participacao in self._participacoes_ativas(agendamento)
+        ]
+
+    def get_atletas_nomes(self, agendamento):
+        # Retorna os nomes exibidos na coluna Participantes.
+        return [
+            participacao.atleta.nome
+            for participacao in self._participacoes_ativas(agendamento)
+        ]
+
+    def get_inscritos_ativos(self, agendamento):
+        # Calcula a quantidade de participantes não cancelados.
+        return len(self._participacoes_ativas(agendamento))
+
+    class Meta:
+        model = Agendamento
+        fields = [
+            "id",
+            "inicio",
+            "fim",
+            "profissional",
+            "profissional_descricao",
+            "espaco",
+            "espaco_descricao",
+            "modalidade",
+            "modalidade_descricao",
+            "limite_participantes",
+            "atletas",
+            "atletas_nomes",
+            "inscritos_ativos",
+            "situacao",
+            "situacao_descricao",
+        ]
+        read_only_fields = fields
+
+
 class ProfissionalSerializer(serializers.ModelSerializer):
     nome = serializers.SerializerMethodField()
 
