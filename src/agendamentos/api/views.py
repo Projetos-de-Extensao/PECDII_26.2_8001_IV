@@ -27,6 +27,7 @@ from .serializers import CriarAgendamentoSerializer
 from .serializers import CancelamentoSerializer
 from .serializers import InscricaoAgendamentoSerializer
 from .serializers import ParticipacaoAgendamentoSerializer
+from .serializers import AgendamentoListaSerializer
 
 
 class EspacoViewSet(viewsets.ModelViewSet):
@@ -73,10 +74,20 @@ class AgendamentoViewSet(viewsets.ViewSet):
     
     def list(self, request):
         # Consulta todos os agendamentos, do mais recente ao mais antigo.
-        agendamentos = Agendamento.objects.all().order_by("-inicio", "-id")
+        agendamentos = (
+            Agendamento.objects.all()
+            .select_related(
+                "profissional__usuario__user",
+                "espaco",
+            )
+            .prefetch_related(
+                "participacoes__atleta",
+            )
+            .order_by("-inicio", "-id")
+        )
 
-        # Converte os agendamentos em dados para a resposta.
-        serializer = AgendamentoSerializer(agendamentos, many=True)
+        # Converte os agendamentos em dados para a página Agenda.
+        serializer = AgendamentoListaSerializer(agendamentos, many=True)
 
         # Retorna a lista com HTTP 200.
         return Response(serializer.data, status=status.HTTP_200_OK)
