@@ -28,6 +28,7 @@ from .serializers import CancelamentoSerializer
 from .serializers import InscricaoAgendamentoSerializer
 from .serializers import ParticipacaoAgendamentoSerializer
 from .serializers import AgendamentoListaSerializer
+from .serializers import AgendamentoDetalheSerializer
 
 
 class EspacoViewSet(viewsets.ModelViewSet):
@@ -93,15 +94,33 @@ class AgendamentoViewSet(viewsets.ViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
-        # Busca um agendamento pelo ID recebido na URL.
-        # Se não existir, retorna HTTP 404.
-        agendamento = get_object_or_404(Agendamento, pk=pk)
+        # Prepara a consulta dos agendamentos e seus relacionamentos.
+        agendamentos = (
+            Agendamento.objects.all()
+            .select_related(
+                "profissional__usuario__user",
+                "espaco",
+                "registrado_por__usuario__user",
+            )
+            .prefetch_related(
+                "equipamentos",
+                "participacoes__atleta",
+                "participacoes__registrado_por__usuario__user",
+            )
+        )
 
-        # Converte o agendamento encontrado em dados para a resposta.
-        serializer = AgendamentoSerializer(agendamento)
+        # Busca o agendamento pelo ID recebido na URL.
+        # Retorna HTTP 404 se o registro não existir.
+        agendamento = get_object_or_404(agendamentos, pk=pk)
 
-        # Retorna o registro com HTTP 200.
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        # Converte o agendamento para a representação detalhada.
+        serializer = AgendamentoDetalheSerializer(agendamento)
+
+        # Retorna os dados com HTTP 200 (OK).
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK,
+        )
 
     def create(self, request):
         # Recebe os dados da requisição e instancia o serializer de criação.
