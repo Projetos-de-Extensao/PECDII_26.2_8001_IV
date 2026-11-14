@@ -718,6 +718,78 @@ class AgendamentoAPITests(APITestCase):
         )
         self.assertEqual(participacao.situacao, "confirmada")
 
+    def test_listar_agendamentos(self):
+        # Cria um agendamento utilizando o endpoint POST.
+        resposta_criacao = self.client.post(
+            reverse("agendamento-list"),
+            self.dados,
+            format="json",
+        )
+
+        # Confirma que o agendamento foi criado com sucesso.
+        self.assertEqual(
+            resposta_criacao.status_code,
+            status.HTTP_201_CREATED,
+            resposta_criacao.data,
+        )
+
+        # Faz uma requisição GET para consultar todos os agendamentos.
+        resposta = self.client.get(reverse("agendamento-list"))
+
+        # Verifica se a consulta retornou HTTP 200 (OK).
+        self.assertEqual(resposta.status_code, status.HTTP_200_OK)
+
+        # Confirma que a lista retornada contém exatamente um agendamento.
+        self.assertEqual(len(resposta.data), 1)
+
+        # Verifica se o ID retornado corresponde ao registro criado.
+        self.assertEqual(
+            resposta.data[0]["id"],
+            resposta_criacao.data["id"],
+        )
+
+    def test_detalhar_agendamento(self):
+        # Cria um agendamento para utilizar como objeto da consulta.
+        resposta_criacao = self.client.post(
+            reverse("agendamento-list"),
+            self.dados,
+            format="json",
+        )
+
+        # Confirma que o POST foi executado com sucesso.
+        self.assertEqual(
+            resposta_criacao.status_code,
+            status.HTTP_201_CREATED,
+            resposta_criacao.data,
+        )
+
+        # Recupera o ID do agendamento criado.
+        agendamento_id = resposta_criacao.data["id"]
+
+        # Faz uma requisição GET para consultar apenas esse agendamento.
+        # O reverse gera a URL utilizando o ID informado.
+        resposta = self.client.get(
+            reverse("agendamento-detail", args=[agendamento_id])
+        )
+
+        # Verifica se a consulta retornou HTTP 200 (OK).
+        self.assertEqual(resposta.status_code, status.HTTP_200_OK)
+
+        # Confirma que o registro retornado possui o ID solicitado.
+        self.assertEqual(resposta.data["id"], agendamento_id)
+
+    def test_detalhar_agendamento_inexistente(self):
+        # Faz uma requisição GET utilizando um ID inexistente.
+        resposta = self.client.get(
+            reverse("agendamento-detail", args=[999999])
+        )
+
+        # Verifica se a API retorna HTTP 404 (Not Found).
+        # O erro é produzido pelo get_object_or_404() do retrieve().
+        self.assertEqual(
+            resposta.status_code,
+            status.HTTP_404_NOT_FOUND,
+        )
 
 # ======================================================================
 # ATLETA
