@@ -71,6 +71,27 @@ class ProfissionalViewSet(viewsets.ReadOnlyModelViewSet):
 
 class AgendamentoViewSet(viewsets.ViewSet):
     
+    def list(self, request):
+        # Consulta todos os agendamentos, do mais recente ao mais antigo.
+        agendamentos = Agendamento.objects.all().order_by("-inicio", "-id")
+
+        # Converte os agendamentos em dados para a resposta.
+        serializer = AgendamentoSerializer(agendamentos, many=True)
+
+        # Retorna a lista com HTTP 200.
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def retrieve(self, request, pk=None):
+        # Busca um agendamento pelo ID recebido na URL.
+        # Se não existir, retorna HTTP 404.
+        agendamento = get_object_or_404(Agendamento, pk=pk)
+
+        # Converte o agendamento encontrado em dados para a resposta.
+        serializer = AgendamentoSerializer(agendamento)
+
+        # Retorna o registro com HTTP 200.
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def create(self, request):
         # Recebe os dados da requisição e instancia o serializer de criação.
         # O serializer será responsável por validar e converter os dados recebidos.
