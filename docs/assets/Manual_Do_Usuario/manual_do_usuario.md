@@ -6,7 +6,7 @@ title: Manual do Usuário
 
 # Manual do Usuário — Playmakerz
 
-**Versão:** 0.2
+**Versão:** 0.3
 **Data:** 13/11/2026  
 **Público:** funcionários e administradores da interface interna.
 
@@ -160,7 +160,7 @@ Uma atividade em grupo pode começar com apenas um atleta inscrito, desde que o 
 
 Esse procedimento inclui o atleta na turma existente, **sem criar outro agendamento**. Grupos lotados não podem ser selecionados.
 
-**[Inserir captura: horários disponíveis, ocupados e grupos com vagas]**
+**![Horários disponíveis agendamento](./Imagens/horarios_disponiveis_agendamento.png)**
 
 ## 7. Registrar aula experimental
 
@@ -183,9 +183,9 @@ O sistema permite apenas **uma aula experimental não cancelada por atleta**. O 
 
 Na Agenda, clique em **Ver detalhes**. A tela mostra horários, profissional, espaço, modalidade, funcionário responsável, equipamentos, observações e participantes.
 
-As situações gerais de agendamento são **Agendado**, **Cancelado** e **Realizado**. As participações podem ter situações como **Confirmada**, **Cancelada**, **Presente**, **Falta** e **Falta justificada**, mas a interface atual não permite registrar todos esses estados.
+As situações gerais de agendamento são **Agendado**, **Cancelado** e **Realizado**. As participações podem ter situações como **Confirmada**, **Cancelada**, **Presente**, **Falta** e **Falta justificada**.
 
-### 8.1 Cancelar um atleta
+### 8.1 Cancelar a participação de um atleta
 
 1. Na página de detalhes, encontre o atleta na seção **Participantes**.
 2. Informe um motivo, se desejar.
@@ -203,7 +203,7 @@ Essa ação está disponível para participações confirmadas em agendamentos a
 
 O cancelamento integral também cancela as participações confirmadas. O histórico do agendamento é preservado. Agendamentos **realizados** não podem ser cancelados.
 
-**[Inserir captura: detalhes, participantes e botões de cancelamento]**
+**![Detalhes, participantes e botões de cancelamento](./Imagens/detalhes_agendamento.png)**
 
 ## 9. Regras relevantes
 
@@ -212,65 +212,10 @@ O cancelamento integral também cancela as participações confirmadas. O histó
 - **Espaço:** pode abrigar atividades simultâneas desde que a soma das vagas reservadas respeite a capacidade.
 - **Menores:** precisam de data de nascimento e responsável vinculado para agendar.
 - **Individual:** um participante.
-- **Grupo:** limite de pelo menos duas vagas, com possibilidade de novas inscrições.
+- **Grupo:** mínimo de duas vagas, com possibilidade de novas inscrições.
 - **Experimental:** cadastro rápido para maiores de 18 anos, registrado por recepcionista.
 
 O sistema apresenta mensagens de validação quando uma operação não cumpre essas regras.
-
-## 10. Problemas comuns
-
-| Situação | O que verificar |
-|---|---|
-| Não consigo acessar a Agenda. | Verifique a autenticação e se a conta possui acesso de staff. |
-| Um profissional não aparece. | Confira se ele está cadastrado e ativo. |
-| Não aparecem horários. | Confira a data e a disponibilidade semanal do profissional. |
-| O horário está ocupado. | Escolha outro bloco ou uma turma com vagas. |
-| O atleta não aparece. | Confira se o cadastro está ativo. |
-| O agendamento do menor foi recusado. | Confira a data de nascimento e o responsável vinculado. |
-| Não consigo criar um grupo. | Confira o limite mínimo e a capacidade do espaço. |
-| A experimental não funciona. | Confira idade, dados obrigatórios, recepcionista e experimental anterior. |
-| Não consigo cancelar. | Verifique a situação do agendamento e da participação. |
-
-## 11. Funcionalidades ainda não disponíveis
-
-A versão atual é uma **interface interna**, não um portal público completo. Não estão implementados na interface:
-
-- Login e cadastro públicos personalizados;
-- Remarcação direta de agendamentos;
-- Agendamentos recorrentes;
-- Envio automático de notificações e lembretes;
-- Ações para registrar presença ou falta;
-- Filtros por data e profissional na lista de agendamentos.
-
-Esses recursos não devem ser descritos como disponíveis até que sejam implementados e testados.
-
-## 12. Preparação do ambiente de demonstração
-
-Esta seção é destinada a quem precisa **executar o projeto localmente**, não à rotina de um funcionário em um sistema já instalado.
-
-Na raiz do repositório:
-
-```powershell
-python -m pip install -r requirements.txt
-cd src
-python manage.py migrate
-python manage.py createsuperuser
-python manage.py runserver
-```
-
-O `createsuperuser` só é necessário se ainda não houver conta administrativa. Com o servidor ativo, acesse `http://127.0.0.1:8000/admin/`.
-
-**Não apague o banco de dados para corrigir problemas sem avaliar a perda dos registros.**
-
-## 13. Pendências para a versão final
-
-- [ ] Inserir capturas das telas reais.
-- [ ] Confirmar os passos de cadastro no Admin.
-- [ ] Testar horários livres, ocupados e grupos com vagas.
-- [ ] Testar agendamentos individuais e em grupo.
-- [ ] Testar inscrição em turma existente e aula experimental.
-- [ ] Testar cancelamentos e conferir mensagens.
-- [ ] Revisar os termos usados nas instruções após os exercícios.
 
 ## Referências internas
 
