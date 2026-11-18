@@ -1,0 +1,14 @@
+{% extends "agendamentos/base.html" %}
+
+{% block navigation %}
+<a class="brand" href="{% url 'portal' %}">
+    <span class="brand-mark">P</span>
+    <span>Playmakerz</span>
+</a>
+{% if user.is_authenticated %}
+    <form method="post" action="{% url 'portal_logout' %}">
+        {% csrf_token %}
+        <button class="button button-small button-secondary" type="submit">Sair</button>
+    </form>
+{% endif %}
+{% endblock %}

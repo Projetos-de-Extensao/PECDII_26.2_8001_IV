@@ -7,6 +7,7 @@ app_name = "agendamentos"
 urlpatterns = [
     path("", views.lista_agendamentos, name="lista"),
     path("novo/", views.novo_agendamento, name="novo"),
+    path("solicitacoes/", views.solicitacoes_reserva, name="solicitacoes"),
     path("horarios/", views.horarios_profissional, name="horarios"),
     path("<int:agendamento_id>/", views.detalhe_agendamento, name="detalhe"),
     path(

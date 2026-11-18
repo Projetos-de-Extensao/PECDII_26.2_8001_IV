@@ -3,18 +3,26 @@
 {% block title %}Agenda{% endblock %}
 
 {% block content %}
-<section class="page-heading">
+<section class="page-heading agenda-hero">
     <div>
-        <p class="eyebrow">Visão geral</p>
-        <h1>Agendamentos</h1>
-        <p>Confira aulas individuais e em grupo registradas no sistema.</p>
+        <p class="eyebrow">Gestão de aulas</p>
+        <h1>Agenda Playmakerz</h1>
+        <p>Consulte as aulas, organize horários e gerencie participantes.</p>
     </div>
     <a class="button" href="{% url 'agendamentos:novo' %}">+ Novo agendamento</a>
 </section>
 
+<dl class="agenda-stats" aria-label="Resumo da agenda">
+    <div><dt>Total de registros</dt><dd>{{ agendamentos|length }}</dd></div>
+    <div><dt>Aulas agendadas</dt><dd>{{ total_agendados }}</dd></div>
+    <div><dt>Aulas em grupo agendadas</dt><dd>{{ total_grupos }}</dd></div>
+</dl>
+
 {% if agendamentos %}
+    <section aria-labelledby="agenda-registros">
+    <h2 class="agenda-title" id="agenda-registros">Aulas registradas</h2>
     <div class="table-card">
-        <table>
+        <table aria-labelledby="agenda-registros">
             <thead>
                 <tr>
                     <th>Data e horário</th>
@@ -23,7 +31,7 @@
                     <th>Modalidade</th>
                     <th>Participantes</th>
                     <th>Situação</th>
-                    <th></th>
+                    <th scope="col">Ações</th>
                 </tr>
             </thead>
             <tbody>
@@ -38,7 +46,7 @@
                         <td>
                             {{ agendamento.get_modalidade_display }}
                             {% if agendamento.modalidade == "grupo" %}
-                                <span class="capacity-count">{{ agendamento.inscritos_ativos }}:{{ agendamento.limite_participantes }}</span>
+                                <span class="capacity-count">{{ agendamento.inscritos_ativos }}/{{ agendamento.limite_participantes }}</span>
                             {% endif %}
                         </td>
                         <td>
@@ -57,11 +65,11 @@
             </tbody>
         </table>
     </div>
+    </section>
 {% else %}
     <section class="empty-state card">
-        <div class="empty-icon">📅</div>
         <h2>Nenhum agendamento ainda</h2>
-        <p>Crie o primeiro para conferir as validações do sistema.</p>
+        <p>Crie uma aula individual ou em grupo para começar.</p>
         <a class="button" href="{% url 'agendamentos:novo' %}">Criar agendamento</a>
     </section>
 {% endif %}

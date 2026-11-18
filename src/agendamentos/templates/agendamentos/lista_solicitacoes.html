@@ -1,0 +1,36 @@
+{% if solicitacoes %}
+<section style="margin-bottom: 24px">
+    {% if portal_decisao %}<h2>Solicitações de agendamento</h2>{% endif %}
+    <div class="table-card">
+        <table aria-label="Solicitações de agendamento">
+            <thead><tr>
+                <th>Atleta</th><th>Aula</th><th>Situação</th><th>Decisão</th>
+            </tr></thead>
+            <tbody>
+            {% for reserva in solicitacoes %}
+                <tr>
+                    <td>{{ reserva.atleta }}</td>
+                    <td>{{ reserva.inicio|date:"d/m/Y H:i" }}–{{ reserva.fim|date:"H:i" }}<br>{{ reserva.profissional }} · {{ reserva.espaco }}</td>
+                    <td>{{ reserva.get_situacao_display }}</td>
+                    <td>
+                        {% if reserva.decidida_em %}
+                            {{ reserva.decidida_por }}<br>{{ reserva.decidida_em|date:"d/m/Y H:i" }}
+                        {% elif portal_decisao and reserva.atleta.responsavel.usuario.user_id == user.pk %}
+                            <form method="post" action="{% url 'portal_decidir_reserva' reserva.pk %}">
+                                {% csrf_token %}
+                                <button class="button button-small" name="decisao" value="autorizar">Autorizar</button>
+                                <button class="button button-small button-secondary" name="decisao" value="recusar">Recusar</button>
+                            </form>
+                        {% else %}
+                            Aguardando responsável
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+{% elif not portal_decisao %}
+<p>Nenhuma solicitação de autorização registrada.</p>
+{% endif %}

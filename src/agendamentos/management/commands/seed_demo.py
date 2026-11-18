@@ -103,6 +103,16 @@ class Command(BaseCommand):
                        email="carla@exemplo.com", telefone="(61) 96666-3333")
         pedro = atleta("Pedro Ferreira (menor)", date(2012, 8, 3),
                        responsavel=responsavel)
+        if pedro.usuario_id is None:
+            pedro.usuario = conta("demo_pedro", "Pedro", "Ferreira")
+            pedro.save(update_fields=["usuario"])
+
+        luiza = atleta("Luiza Ribeiro", date(2000, 3, 12),
+                       email="demo_luiza@example.com", telefone="21999990000")
+        if luiza.usuario_id is None:
+            luiza.usuario = conta("demo_luiza", "Luiza", "Ribeiro")
+            luiza.save(update_fields=["usuario"])
+
         atleta("Lucas Prado (sem nascimento)", None)  # exemplo de cadastro incompleto
         visitante = atleta("Visitante Experimental", date(2000, 1, 15),
                            email="visitante@exemplo.com",
@@ -130,9 +140,37 @@ class Command(BaseCommand):
                 limite_participantes=6, equipamentos=[bola],
                 observacoes="Turma de vôlei")
 
+        dia_demo = proximo_dia_util(timezone.localdate())
+        datas_demo = [dia_demo + timedelta(weeks=semana) for semana in range(3)]
+        for dia in datas_demo:
+            for profissional, espaco, atletas, hora, minuto, descricao, limite in (
+                (ana, sala, [luiza], 8, 30, "Avaliação funcional", 1),
+                (ana, sala, [pedro], 14, 0, "Acompanhamento funcional", 1),
+                (bruno, quadra, [carla], 9, 30, "Treino em grupo · vagas abertas", 6),
+                (bruno, quadra, [joao, carla], 16, 0, "Circuito em grupo · turma lotada", 2),
+            ):
+                inicio = momento(dia, hora, minuto)
+                fim = inicio + timedelta(minutes=30)
+                if Agendamento.objects.filter(
+                    profissional=profissional, inicio__lt=fim, fim__gt=inicio,
+                ).exclude(situacao=Agendamento.Situacao.CANCELADO).exists():
+                    continue
+                criar_agendamento(
+                    profissional=profissional, espaco=espaco, atletas=atletas,
+                    registrado_por=recep, inicio=inicio, fim=fim,
+                    modalidade=(Agendamento.Modalidade.GRUPO if limite > 1
+                                else Agendamento.Modalidade.INDIVIDUAL),
+                    observacoes=descricao, limite_participantes=limite,
+                )
+
         self.stdout.write(self.style.SUCCESS("Dados de demonstração prontos."))
         self.stdout.write(
-            f"Logins (senha {SENHA}): recepcao, prof_ana, prof_bruno, resp_marta")
+            "Datas para a demonstração: " + ", ".join(
+                dia.strftime("%d/%m/%Y") for dia in datas_demo
+            )
+        )
+        self.stdout.write(
+            f"Logins (senha {SENHA}): recepcao, resp_marta, demo_pedro, demo_luiza, prof_ana, prof_bruno")
         self.stdout.write(
             "Aula experimental: use o atleta 'Visitante Experimental' "
             "(registrado_por = a recepcionista).")

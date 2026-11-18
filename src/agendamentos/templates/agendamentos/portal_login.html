@@ -1,0 +1,20 @@
+{% extends "agendamentos/portal_base.html" %}
+{% block title %}Entrar{% endblock %}
+
+{% block content %}
+<form class="card portal-login" method="post">
+    {% csrf_token %}
+    <h1>Portal do aluno</h1>
+    <p>Entre para consultar seus agendamentos e os dos atletas sob sua responsabilidade.</p>
+    {% if form.non_field_errors %}<div class="form-errors">{{ form.non_field_errors }}</div>{% endif %}
+    {% for field in form %}
+        <div class="field">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.errors %}<div class="field-error">{{ field.errors }}</div>{% endif %}
+        </div>
+    {% endfor %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <button class="button" type="submit">Entrar</button>
+</form>
+{% endblock %}

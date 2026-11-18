@@ -62,6 +62,8 @@ class Agendamento(models.Model):
         "usuarios.Funcionario",
         on_delete=models.PROTECT,
         related_name="agendamentos_registrados",
+        null=True,
+        blank=True,
     )
     inicio = models.DateTimeField()
     fim = models.DateTimeField()
@@ -240,3 +242,40 @@ class ParticipacaoAgendamento(models.Model):
 
     def __str__(self):
         return f"{self.atleta} - {self.get_situacao_display()}"
+
+
+class SolicitacaoReserva(models.Model):
+    class Situacao(models.TextChoices):
+        PENDENTE = "pendente", "Aguardando autorização"
+        AUTORIZADA = "autorizada", "Autorizada · aula confirmada"
+        RECUSADA = "recusada", "Cancelada · autorização recusada"
+
+    atleta = models.ForeignKey("usuarios.Atleta", on_delete=models.PROTECT)
+    profissional = models.ForeignKey("usuarios.Profissional", on_delete=models.PROTECT)
+    espaco = models.ForeignKey(Espaco, on_delete=models.PROTECT)
+    inicio = models.DateTimeField()
+    fim = models.DateTimeField()
+    grupo = models.ForeignKey(
+        Agendamento, on_delete=models.PROTECT, null=True, related_name="+"
+    )
+    agendamento_confirmado = models.ForeignKey(
+        Agendamento, on_delete=models.PROTECT, null=True, related_name="+"
+    )
+    situacao = models.CharField(
+        max_length=12, choices=Situacao.choices, default=Situacao.PENDENTE
+    )
+    criada_em = models.DateTimeField(auto_now_add=True)
+    decidida_em = models.DateTimeField(null=True)
+    decidida_por = models.ForeignKey(
+        "usuarios.Responsavel", on_delete=models.PROTECT, null=True
+    )
+
+    class Meta:
+        ordering = ["-criada_em", "-pk"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["atleta", "profissional", "inicio"],
+                condition=models.Q(situacao="pendente"),
+                name="reserva_pendente_unica_por_horario",
+            )
+        ]

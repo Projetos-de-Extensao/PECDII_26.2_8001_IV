@@ -12,7 +12,7 @@ from django.views.decorators.http import require_POST
 from usuarios.models import Atleta, Profissional
 
 from .forms import AgendamentoForm, CancelamentoForm
-from .models import Agendamento, ParticipacaoAgendamento
+from .models import Agendamento, ParticipacaoAgendamento, SolicitacaoReserva
 from .services import (
     cancelar_agendamento,
     cancelar_participacao,
@@ -52,10 +52,18 @@ def lista_agendamentos(request: HttpRequest) -> HttpResponse:
         )
         .order_by("-inicio", "-id")
     )
+    agendamentos = list(agendamentos)
     return render(
         request,
         "agendamentos/lista.html",
-        {"agendamentos": agendamentos},
+        {
+            "agendamentos": agendamentos,
+            "total_agendados": sum(item.situacao == "agendado" for item in agendamentos),
+            "total_grupos": sum(
+                item.situacao == "agendado" and item.modalidade == "grupo"
+                for item in agendamentos
+            ),
+        },
     )
 
 
@@ -241,3 +249,12 @@ def cancelar_participacao_view(
         "agendamentos:detalhe",
         participacao.agendamento_id,
     )
+
+
+@staff_member_required
+def solicitacoes_reserva(request):
+    return render(request, "agendamentos/solicitacoes_reserva.html", {
+        "solicitacoes": SolicitacaoReserva.objects.select_related(
+            "atleta__responsavel__usuario", "profissional__usuario__user", "espaco", "decidida_por"
+        ),
+    })

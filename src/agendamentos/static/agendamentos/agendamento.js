@@ -30,6 +30,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const cadastrando = modoExperimentalAtivo();
         atletasExistentes.classList.toggle("is-hidden", cadastrando);
         camposNovoAtleta.classList.toggle("is-hidden", !cadastrando);
+        for (const campo of camposNovoAtleta.querySelectorAll("input")) {
+            campo.disabled = !cadastrando;
+        }
         aulaExperimental.value = cadastrando ? "true" : "false";
         botaoExperimental.classList.toggle("is-active", cadastrando);
         botaoExperimental.setAttribute("aria-pressed", String(cadastrando));

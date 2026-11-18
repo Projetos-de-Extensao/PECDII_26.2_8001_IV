@@ -29,7 +29,7 @@
                     {% endif %}
                 </dd>
             </div>
-            <div><dt>Registrado por</dt><dd>{{ agendamento.registrado_por }}</dd></div>
+            <div><dt>Registrado por</dt><dd>{{ agendamento.registrado_por|default_if_none:"Portal do aluno" }}</dd></div>
             <div>
                 <dt>Equipamentos</dt>
                 <dd>

@@ -1,0 +1,50 @@
+{% extends "agendamentos/portal_base.html" %}
+{% block title %}Minhas aulas{% endblock %}
+
+{% block content %}
+<section class="page-heading agenda-hero">
+    <div>
+        <p class="eyebrow">Portal do aluno</p>
+        <h1>Minhas aulas</h1>
+        <p>Olá, {{ user.first_name|default:user.username }}. Confira seus horários e locais.</p>
+    </div>
+    <a class="button" href="{% url 'portal_reserva' %}">Agendar aula</a>
+</section>
+{% include "agendamentos/lista_solicitacoes.html" %}
+{% if participacoes %}
+    <div class="table-card">
+        <table aria-label="Minhas aulas">
+            <thead><tr>
+                <th scope="col">Data e horário</th>
+                <th scope="col">Atleta</th>
+                <th scope="col">Profissional</th>
+                <th scope="col">Espaço</th>
+                <th scope="col">Modalidade</th>
+                <th scope="col">Situação</th>
+            </tr></thead>
+            <tbody>
+            {% for participacao in participacoes %}
+                {% with aula=participacao.agendamento %}
+                <tr>
+                    <td><strong>{{ aula.inicio|date:"d/m/Y" }}</strong><br>{{ aula.inicio|date:"H:i" }}–{{ aula.fim|date:"H:i" }}</td>
+                    <td>{{ participacao.atleta.nome }}</td>
+                    <td>{{ aula.profissional }}</td>
+                    <td>{{ aula.espaco }}</td>
+                    <td>{{ aula.get_modalidade_display }}</td>
+                    <td>
+                        {% if aula.situacao == "cancelado" %}
+                            <span class="status status-cancelado">{{ aula.get_situacao_display }}</span>
+                        {% else %}
+                            <span class="status status-{{ participacao.situacao }}">{{ participacao.get_situacao_display }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endwith %}
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% else %}
+    <section class="card empty-state"><h2>Nenhuma aula vinculada a esta conta</h2></section>
+{% endif %}
+{% endblock %}

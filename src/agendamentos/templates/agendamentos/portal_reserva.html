@@ -1,0 +1,46 @@
+{% extends "agendamentos/portal_base.html" %}
+{% block title %}Agendar aula{% endblock %}
+
+{% block content %}
+<section class="page-heading">
+    <h1>Agendar aula</h1>
+    <a class="link" href="{% url 'portal' %}">Voltar para Minhas aulas</a>
+</section>
+<form class="card form-card" method="post">
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+        <div class="form-errors" role="alert">{{ form.non_field_errors }}</div>
+    {% endif %}
+    <div class="form-grid">
+        {% for field in form %}
+            <div class="field">
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.name == "data" %}
+                    <small id="reserva-intervalo-data">{{ form.data_minima|date:"d/m/Y" }} a {{ form.data_maxima|date:"d/m/Y" }}</small>
+                {% endif %}
+                {% if field.errors %}<div class="field-error">{{ field.errors }}</div>{% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    <div class="form-actions">
+        <button class="button button-secondary" name="acao" value="consultar">Consultar horários</button>
+    </div>
+    {% if opcoes %}
+        <div class="field">
+            <label for="horario">Horário</label>
+            <select name="horario" id="horario">
+                <option value="">Selecione um horário</option>
+                {% for chave, opcao in opcoes.items %}
+                    <option value="{{ chave }}">{{ opcao.rotulo }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="form-actions">
+            <button class="button" name="acao" value="reservar">Confirmar agendamento</button>
+        </div>
+    {% elif form.is_bound and not form.errors %}
+        <p>Nenhum horário disponível para esta data.</p>
+    {% endif %}
+</form>
+{% endblock %}

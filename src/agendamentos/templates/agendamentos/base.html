@@ -5,26 +5,28 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %}Agendamentos{% endblock %} | Playmakerz</title>
-    <link rel="stylesheet" href="{% static 'agendamentos/style.css' %}?v=20261021-1">
+    <link rel="stylesheet" href="{% static 'agendamentos/style.css' %}?v=20261118-3">
+    <script src="{% static 'agendamentos/calendario.js' %}?v=20261118-2" defer></script>
 </head>
 <body>
     <header class="topbar">
         <div class="container topbar-content">
+            {% block navigation %}
             <a class="brand" href="{% url 'agendamentos:lista' %}">
                 <span class="brand-mark">P</span>
                 <span>Playmakerz</span>
             </a>
-            <nav>
+            <nav aria-label="Navegação principal">
                 <a href="{% url 'agendamentos:lista' %}">Agenda</a>
+                <a href="{% url 'agendamentos:solicitacoes' %}">Autorizações</a>
                 <a class="button button-small" href="{% url 'agendamentos:novo' %}">Novo agendamento</a>
-                <a href="{% url 'admin:index' %}">Admin</a>
+                <a href="{% url 'admin:index' %}">Administração</a>
             </nav>
+            {% endblock %}
         </div>
     </header>
 
     <main class="container page">
-        <div class="environment-note">Interface interna para conferência e testes</div>
-
         {% if messages %}
             <div class="messages">
                 {% for message in messages %}

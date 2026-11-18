@@ -77,10 +77,17 @@ class AgendamentoForm(forms.Form):
     novo_atleta_data_de_nascimento = forms.DateField(
         label="Data de nascimento",
         required=False,
+        input_formats=["%d/%m/%Y", "%Y-%m-%d"],
         widget=forms.DateInput(
-            format="%Y-%m-%d",
-            attrs={"type": "date"},
+            format="%d/%m/%Y",
+            attrs={
+                "placeholder": "dd/mm/aaaa",
+                "autocomplete": "bday",
+                "inputmode": "numeric",
+                "data-calendario": "nascimento",
+            },
         ),
+        error_messages={"invalid": "Informe uma data válida no formato dd/mm/aaaa."},
     )
     equipamentos = forms.ModelMultipleChoiceField(
         label="Equipamentos",
@@ -127,6 +134,9 @@ class AgendamentoForm(forms.Form):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["novo_atleta_data_de_nascimento"].widget.attrs["data-maxima"] = (
+            timezone.localdate().strftime("%d/%m/%Y")
+        )
         self.fields["profissional"].queryset = (
             Profissional.objects.filter(ativo=True)
             .select_related("usuario__user")
